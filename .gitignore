@@ -45,3 +45,15 @@ $RECYCLE.BIN/
 Network Trash Folder
 Temporary Items
 .apdisk
+.vs/
+Mirror2MegaNZ/bin/
+Mirror2MegaNZ/bin/Debug/
+Mirror2MegaNZ/obj/
+Mirror2MegaNZ/obj/Debug/
+Mirror2MegaNZ/FileForTesting/
+Mirror2MegaNZ/LocalRoot/
+Mirror2MegaNZ.UnitTests/bin/
+Mirror2MegaNZ.UnitTests/bin/Debug/
+Mirror2MegaNZ.UnitTests/obj/
+Mirror2MegaNZ.UnitTests/obj/Debug/
+packages/
