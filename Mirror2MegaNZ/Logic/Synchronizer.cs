@@ -15,12 +15,12 @@ namespace Mirror2MegaNZ.Logic
         private readonly Cleaner _cleaner;
         private readonly Updater _updater;
 
-        public Synchronizer(IMegaApiClient client, IFileManager fileManager)
+        public Synchronizer(IMegaApiClient client, IFileManager fileManager, IConsoleWrapper consoleWrapper)
         {
             _megaClient = client;
             _fileManager = fileManager;
             _cleaner = new Cleaner(_megaClient);
-            _updater = new Updater(_megaClient, _fileManager);
+            _updater = new Updater(_megaClient, _fileManager, consoleWrapper);
         }
 
         public void SyncronizeFolder(LocalNode localRoot, MegaNZTreeNode remoteRoot, ILogger logger)

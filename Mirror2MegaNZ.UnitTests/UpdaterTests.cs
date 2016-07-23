@@ -44,17 +44,22 @@ namespace Mirror2MegaNZ.UnitTests
                 Parent = null
             };
 
-            const string remoteFileName = "LocalFileNotInRemote-2016_1_1_0_0_0.jpeg";
+            const string remoteFileName = "LocalFileNotInRemote_[[2016-1-1-0-0-0]].jpeg";
             var mockClient = new Mock<IMegaApiClient>(MockBehavior.Strict);
-            mockClient.Setup(m => m.Upload(It.IsAny<Stream>(), remoteFileName, remoteTreeRoot.ObjectValue)).Returns(new MegaNZNode());    // We don't care the result
+            mockClient.Setup(m => m.UploadAsync(It.IsAny<Stream>(), 
+                                                remoteFileName, 
+                                                remoteTreeRoot.ObjectValue, 
+                                                It.IsAny<IProgress<double>>()))
+                      .ReturnsAsync(new MegaNZNode());    // We don't care the result
 
             var mockFileManager = new Mock<IFileManager>(MockBehavior.Strict);
             mockFileManager.Setup(m => m.GetStreamToReadFile(localFileInRoot.FullPath)).Returns((FileStream)null);
 
             var mockLogger = new Mock<ILogger>();
+            var mockConsole = new Mock<IConsoleWrapper>();
 
             // Act
-            var updater = new Updater(mockClient.Object, mockFileManager.Object);
+            var updater = new Updater(mockClient.Object, mockFileManager.Object, mockConsole.Object);
             updater.Update(localRoot, remoteTreeRoot, mockLogger.Object);
 
             // Assert
@@ -68,7 +73,7 @@ namespace Mirror2MegaNZ.UnitTests
             // Given there is a folder in the local root that is not in the remote folder
             // And the local folder contains some files
             // Then the client.Create() must be colled to create the folder in remote
-            // And all the file in the loca folder must be updated in the remote new folder
+            // And all the file in the local folder must be updated in the remote new folder
             // And in the remote root we should find a new folder with the correct parameters
             // And in the new folder in remote there should be two new files with the correct parameters
             var localRoot = new LocalNode
@@ -148,10 +153,12 @@ namespace Mirror2MegaNZ.UnitTests
                 },
                 Parent = newRemoteFolderTreeNode
             };
-            mockClient.Setup(m => m.Upload(It.IsAny<FileStream>(), 
-                                           NameHandler.BuildRemoteFileName(file1InLocalFolder.Name, file1InLocalFolder.LastModificationDate), 
-                                           It.Is<INode>(node => node.Id == newRemoteFolderTreeNode.ObjectValue.Id)))
-                      .Returns(newFile1InRemoteFolder.ObjectValue);
+            var remoteFilename = NameHandler.BuildRemoteFileName(file1InLocalFolder.Name, file1InLocalFolder.LastModificationDate);
+            mockClient.Setup(m => m.UploadAsync(It.IsAny<FileStream>(), 
+                                           remoteFilename, 
+                                           It.Is<INode>(node => node.Id == newRemoteFolderTreeNode.ObjectValue.Id),
+                                           It.IsAny<IProgress<double>>()))
+                      .ReturnsAsync(newFile1InRemoteFolder.ObjectValue);
 
             var newFile2InRemoteFolder = new MegaNZTreeNode
             {
@@ -165,15 +172,18 @@ namespace Mirror2MegaNZ.UnitTests
                 },                
                 Parent = newRemoteFolderTreeNode
             };
-            mockClient.Setup(m => m.Upload(It.IsAny<FileStream>(),
-                                           NameHandler.BuildRemoteFileName(file2InLocalFolder.Name, file2InLocalFolder.LastModificationDate), 
-                                           It.Is<INode>(node => node.Id == newRemoteFolderTreeNode.ObjectValue.Id)))
-                      .Returns(newFile2InRemoteFolder.ObjectValue);
+            remoteFilename = NameHandler.BuildRemoteFileName(file2InLocalFolder.Name, file2InLocalFolder.LastModificationDate);
+            mockClient.Setup(m => m.UploadAsync(It.IsAny<FileStream>(),
+                                           remoteFilename, 
+                                           It.Is<INode>(node => node.Id == newRemoteFolderTreeNode.ObjectValue.Id),
+                                           It.IsAny<IProgress<double>>()))
+                      .ReturnsAsync(newFile2InRemoteFolder.ObjectValue);
 
             var mockLogger = new Mock<ILogger>();
+            var mockConsole = new Mock<IConsoleWrapper>();
 
             // Act
-            var updater = new Updater(mockClient.Object, mockFileManager.Object);
+            var updater = new Updater(mockClient.Object, mockFileManager.Object, mockConsole.Object);
             updater.Update(localRoot, remoteTreeRoot, mockLogger.Object);
 
             // Assert

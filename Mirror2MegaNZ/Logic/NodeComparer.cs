@@ -34,7 +34,7 @@ namespace Mirror2MegaNZ.Logic
             }
 
             // For the folder, we compare only the name
-            return folder.NameWithoutLastModification.Equals(localFolder.Name, StringComparison.InvariantCultureIgnoreCase);
+            return folder.ObjectValue.Name.Equals(localFolder.Name, StringComparison.InvariantCultureIgnoreCase);
         }
     }
 }

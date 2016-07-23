@@ -4,19 +4,17 @@ namespace Mirror2MegaNZ.Logic
 {
     internal class ProgressNotifier : IProgress<double>
     {
-        private readonly int _cursorPositionLeft;
-        private readonly int _cursorPositionTop;
+        private readonly IConsoleWrapper _consoleWrapper;
 
-        public ProgressNotifier(int cursorPositionLeft, int cursorPositionTop)
+        public ProgressNotifier(IConsoleWrapper consoleWrapper)
         {
-            _cursorPositionLeft = cursorPositionLeft;
-            _cursorPositionTop = cursorPositionTop;
+            _consoleWrapper = consoleWrapper;
         }
 
         public void Report(double value)
         {
-            Console.SetCursorPosition(_cursorPositionLeft, _cursorPositionTop);
-            Console.Write(string.Format("\r{0}%", value.ToString("F1")));
+            _consoleWrapper.SetCursorPosition(_consoleWrapper.CursorLeft, _consoleWrapper.CursorTop);
+            _consoleWrapper.Write(string.Format("\r{0}%", value.ToString("F1")));
         }
     }
 }

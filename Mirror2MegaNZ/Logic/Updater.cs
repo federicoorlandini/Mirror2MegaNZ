@@ -15,11 +15,13 @@ namespace Mirror2MegaNZ.Logic
     {
         private readonly IMegaApiClient _client;
         private readonly IFileManager _fileManager;
+        private readonly IConsoleWrapper _consoleWrapper;
 
-        public Updater(IMegaApiClient client, IFileManager fileManager)
+        public Updater(IMegaApiClient client, IFileManager fileManager, IConsoleWrapper consoleWrapper)
         {
             _client = client;
             _fileManager = fileManager;
+            _consoleWrapper = consoleWrapper;
         }
 
         public void Update(LocalNode localRoot, MegaNZTreeNode remoteRoot, ILogger logger)
@@ -103,7 +105,7 @@ namespace Mirror2MegaNZ.Logic
             using (var fileStream = _fileManager.GetStreamToReadFile(file.FullPath))
             {
                 var remoteFileName = NameHandler.BuildRemoteFileName(file.Name, file.LastModificationDate);
-                var notifier = new ProgressNotifier(Console.CursorLeft, Console.CursorTop);
+                var notifier = new ProgressNotifier(_consoleWrapper);
                 _client.UploadAsync(fileStream, remoteFileName, remoteRoot.ObjectValue, notifier).Wait();
             }
             Console.WriteLine();

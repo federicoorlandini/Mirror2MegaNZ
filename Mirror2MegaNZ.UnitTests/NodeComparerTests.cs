@@ -26,7 +26,7 @@ namespace MegaNZTest1.UnitTests
                 ObjectValue = new MegaNZNode
                 {
                     Id = "2",
-                    Name = "LocalFile-2016_1_1_0_0_0.jpeg",
+                    Name = "LocalFile_[[2016-1-1-0-0-0]].jpeg",
                     Type = NodeType.File
                 }
             };
@@ -53,7 +53,7 @@ namespace MegaNZTest1.UnitTests
                 ObjectValue = new MegaNZNode
                 {
                     Id = "2",
-                    Name = "DifferentName-2016_1_1_0_0_0.jpeg",
+                    Name = "DifferentName_[[2016-1-1-0-0-0]].jpeg",
                     Type = NodeType.File,
                     Size = 100
                 }
@@ -106,7 +106,7 @@ namespace MegaNZTest1.UnitTests
                 ObjectValue = new MegaNZNode
                 {
                     Id = "2",
-                    Name = "LocalFile-2016_1_1_0_0_0.jpeg",
+                    Name = "LocalFile_[[2016-1-1-0-0-0]].jpeg",
                     Type = NodeType.File,
                     LastModificationDate = localFile.LastModificationDate,
                     Size = 1
@@ -135,7 +135,7 @@ namespace MegaNZTest1.UnitTests
                 ObjectValue = new MegaNZNode
                 {
                     Id = "2",
-                    Name = "LocalFile-2016_1_1_0_0_1.jpeg",
+                    Name = "LocalFile_[[2016-1-1-0-0-1]].jpeg",
                     Type = localFile.Type,
                     LastModificationDate = new DateTime(2016, 1, 1, 0, 0, 1),
                     Size = localFile.Size

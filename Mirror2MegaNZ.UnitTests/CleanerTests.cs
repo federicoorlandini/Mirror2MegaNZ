@@ -81,7 +81,7 @@ namespace Mirror2MegaNZ.UnitTests
                 ObjectValue = new MegaNZNode
                 {
                     Id = "2",
-                    Name = "RemoteFileInLocal-2016_1_1_0_0_0.jpeg",
+                    Name = "RemoteFileInLocal_[[2016-1-1-0-0-0]].jpeg",
                     Type = NodeType.File,
                     Size = 100,
                     LastModificationDate = new DateTime(2016, 1, 1, 0, 0, 0)

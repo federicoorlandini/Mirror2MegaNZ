@@ -10,7 +10,7 @@
         {
             if(sizeInByte < OneKiloByte )
             {
-                return string.Format("{0} bytes");
+                return string.Format("{0} bytes", sizeInByte);
             }
             else if(sizeInByte >= OneKiloByte && sizeInByte < OneMegaByte)
             {

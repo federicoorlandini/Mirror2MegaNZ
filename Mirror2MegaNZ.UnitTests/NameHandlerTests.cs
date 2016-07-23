@@ -9,13 +9,28 @@ namespace MegaNZTest1.UnitTests
     public class NameHandlerTests
     {
         [Test]
-        public void ExtractDateTimeFromName_shouldReturnTheCorrectValue()
+        public void ExtractFileNameAndDateTimeFromRemoteFilename_shouldReturnTheCorrectName()
         {
-            var name = "filename-2016_1_1_0_0_0.jpeg";
+            const string originalFilenameWithDateTime = "filename_[[2016-1-1-0-0-0]].jpeg";
+            const string originalFilenameWithoutDateTime = "filename.jpeg";
 
-            var result = NameHandler.ExtractDateTimeFromName(name);
+            string extractedFilename;
+            DateTime extractedDatetime;
+            NameHandler.ExtractFilenameAndDateTimeFromRemoteFilename(originalFilenameWithDateTime, out extractedFilename, out extractedDatetime);
 
-            Assert.AreEqual(new DateTime(2016, 1, 1, 0, 0, 0), result);
+            Assert.AreEqual(originalFilenameWithoutDateTime, extractedFilename);
+        }
+
+        [Test]
+        public void ExtractFileNameAndDateTimeFromName_shouldReturnTheCorrectDateTime()
+        {
+            const string oringalFilename = "filename_[[2016-1-1-0-0-0]].jpeg";
+
+            string extractedFilename;
+            DateTime extractedDatetime;
+            NameHandler.ExtractFilenameAndDateTimeFromRemoteFilename(oringalFilename, out extractedFilename, out extractedDatetime);
+
+            Assert.AreEqual(new DateTime(2016, 1, 1, 0, 0, 0), extractedDatetime);
         }
 
         [Test]
@@ -26,7 +41,7 @@ namespace MegaNZTest1.UnitTests
 
             var result = NameHandler.BuildRemoteFileName(filename, lastModificationDate);
 
-            Assert.AreEqual("filename-2016_1_1_0_0_0.jpg", result);
+            Assert.AreEqual("filename_[[2016-1-1-0-0-0]].jpg", result);
 
         }
 

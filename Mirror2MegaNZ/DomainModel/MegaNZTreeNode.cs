@@ -41,26 +41,31 @@ namespace Mirror2MegaNZ.DomainModel
         {
             get
             {
-                String nameWithoutExtension;
                 if (ObjectValue.Type == NodeType.Directory)
                 {
                     return ObjectValue.Name;
                 }
                 else
                 {
-                    var extension = Path.GetExtension(ObjectValue.Name);
-                    nameWithoutExtension = Path.GetFileNameWithoutExtension(ObjectValue.Name);
-                    nameWithoutExtension = nameWithoutExtension.TrimEnd('.');   // We must remove the last '.' char
-                    var separatorPosition = nameWithoutExtension.LastIndexOf('-');
-                    nameWithoutExtension = nameWithoutExtension.Substring(0, separatorPosition);
-                    return nameWithoutExtension + extension;
+                    string filename;
+                    DateTime datetime;
+                    NameHandler.ExtractFilenameAndDateTimeFromRemoteFilename(ObjectValue.Name, out filename, out datetime);
+
+                    return filename;
                 }
             }
         }
 
         public DateTime LastModification
         {
-            get { return NameHandler.ExtractDateTimeFromName(ObjectValue.Name); }
+            get
+            {
+                string extractedName;
+                DateTime extractedDatetime;
+                NameHandler.ExtractFilenameAndDateTimeFromRemoteFilename(ObjectValue.Name, out extractedName, out extractedDatetime);
+
+                return extractedDatetime;
+            }
         }
     }
 }

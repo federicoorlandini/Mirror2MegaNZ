@@ -44,7 +44,8 @@ namespace Mirror2MegaNZ
 
             logger.Trace("Starting synchroniziong...");
             var fileManager = new FileManager();
-            var syncronizer = new Synchronizer(client, fileManager);
+            var consoleWrapper = new ConsoleWrapper();
+            var syncronizer = new Synchronizer(client, fileManager, consoleWrapper);
             syncronizer.SyncronizeFolder(localRoot, remoteRoot, logger);
         }
 

@@ -1,25 +1,30 @@
 ﻿using System;
 using System.IO;
+using System.Text.RegularExpressions;
 
 namespace Mirror2MegaNZ.Logic
 {
     public static class NameHandler
     {
-        public static DateTime ExtractDateTimeFromName(string name)
+        public static void ExtractFilenameAndDateTimeFromRemoteFilename(string remoteFilename, out string extractedFilename, out DateTime extractedDateTime)
         {
-            var nameWithoutExtension = Path.GetFileNameWithoutExtension(name).TrimEnd('.');
-            var separatorPosition = nameWithoutExtension.LastIndexOf('-');
-            var dateTimeString = nameWithoutExtension.Substring(separatorPosition + 1).Trim();
-            var item = dateTimeString.Split('_');
+            var regex = new Regex(@"^(.*)_\[\[(\d{4})-(\d{0,2})-(\d{0,2})-(\d{0,2})-(\d{0,2})-(\d{0,2})\]\](\..*)$");
+            var matches = regex.Matches(remoteFilename);
+            var match = matches[0];
 
-            var year = int.Parse(item[0]);
-            var month = int.Parse(item[1]);
-            var day = int.Parse(item[2]);
-            var hour = int.Parse(item[3]);
-            var minute = int.Parse(item[4]);
-            var second = int.Parse(item[5]);
+            var filenameWithoutExtension = match.Groups[1].Value;
 
-            return new DateTime(year, month, day, hour, minute, second);
+            var year = int.Parse(match.Groups[2].Value);
+            var month = int.Parse(match.Groups[3].Value);
+            var day = int.Parse(match.Groups[4].Value);
+            var hour = int.Parse(match.Groups[5].Value);
+            var minute = int.Parse(match.Groups[6].Value);
+            var second = int.Parse(match.Groups[7].Value);
+
+            var fileExtensionWithDot = match.Groups[8].Value;
+
+            extractedFilename = filenameWithoutExtension + fileExtensionWithDot;
+            extractedDateTime = new DateTime(year, month, day, hour, minute, second);
         }
 
         public static string BuildRemoteFileName(string name, DateTime lastModificationDate)
@@ -29,10 +34,10 @@ namespace Mirror2MegaNZ.Logic
             // For this reason, I add the local last modification datetime in the name of the file
             // that is created in remote.
             // The structure of the name is:
-            //      <filename>-[year]_[month]_[day]_[hour]_[minute]_[second]
+            //      <filename>_[[<year>-<month>-<day>-<hour>-<minute>-<second>]]
             var nameWithoutExtension = Path.GetFileNameWithoutExtension(name);
             var extension = Path.GetExtension(name);
-            var remoteFilename = string.Format("{0}-{1}_{2}_{3}_{4}_{5}_{6}",
+            var remoteFilename = string.Format("{0}_[[{1}-{2}-{3}-{4}-{5}-{6}]]",
                 nameWithoutExtension.Trim(),
                 lastModificationDate.Year,
                 lastModificationDate.Month,

@@ -63,8 +63,10 @@
     <Compile Include="Configuration\ConfigurationReader.cs" />
     <Compile Include="DomainModel\MegaNZNode.cs" />
     <Compile Include="DomainModel\MegaNZTreeNode.cs" />
+    <Compile Include="Logic\ConsoleWrapper.cs" />
     <Compile Include="Logic\FileManager.cs" />
     <Compile Include="Logic\FileSizeFormatter.cs" />
+    <Compile Include="Logic\IConsoleWrapper.cs" />
     <Compile Include="Logic\IFileManager.cs" />
     <Compile Include="Logic\NameHandler.cs" />
     <Compile Include="Logic\NodeComparer.cs" />
