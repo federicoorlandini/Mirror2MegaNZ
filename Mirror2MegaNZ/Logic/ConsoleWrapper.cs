@@ -1,4 +1,11 @@
 ﻿using System;
+
+namespace Mirror2MegaNZ.Logic
+{
+    /// <summary>
+    /// This is a simple wrapper for the Console static class
+    /// to be ale to unit test the code
+    /// </summary>
     public class ConsoleWrapper : IConsoleWrapper
     {
         public int CursorLeft
