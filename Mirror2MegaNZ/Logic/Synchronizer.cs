@@ -23,6 +23,15 @@ namespace Mirror2MegaNZ.Logic
             _updater = new Updater(_megaClient, _fileManager, consoleWrapper);
         }
 
+        /// <summary>
+        /// Occurs when inner cleaner object is ready to delete a remote file.
+        /// </summary>
+        public event OnRemoteDeletingHandler RemoteFileDeletingHandler
+        {
+            add { _cleaner.OnRemoteDeleting += value; }
+            remove { _cleaner.OnRemoteDeleting -= value; }
+        }
+
         public void SyncronizeFolder(LocalNode localRoot, MegaNZTreeNode remoteRoot, ILogger logger)
         {
             logger.Trace("Cleanin up remote repository");

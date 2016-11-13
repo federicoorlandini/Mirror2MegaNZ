@@ -73,6 +73,7 @@
     <Compile Include="Logic\NodeConverter.cs" />
     <Compile Include="Logic\Cleaner.cs" />
     <Compile Include="Logic\ProgressNotifier.cs" />
+    <Compile Include="Logic\RemoteFileDeletingEventArgs.cs" />
     <Compile Include="Logic\Synchronizer.cs" />
     <Compile Include="DomainModel\LocalNode.cs" />
     <Compile Include="Program.cs" />

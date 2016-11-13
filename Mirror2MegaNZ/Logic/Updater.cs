@@ -27,16 +27,26 @@ namespace Mirror2MegaNZ.Logic
         public void Update(LocalNode localRoot, MegaNZTreeNode remoteRoot, ILogger logger)
         {
             // Retrieve the files that are in the local root but no in the remote root
-            var localFiles = localRoot.ChildNodes.Where(node => node.Type == NodeType.File).ToArray();
-            var remoteFiles = remoteRoot.ChildNodes.Where(node => node.ObjectValue.Type == NodeType.File).ToArray();
+            var localFiles = localRoot
+                .ChildNodes
+                .Where(node => node.Type == NodeType.File)
+                .ToDictionary(item => item.HashCode);
+            var remoteFiles = remoteRoot
+                .ChildNodes
+                .Where(node => node.ObjectValue.Type == NodeType.File)
+                .ToDictionary(item => item.HashCode);
 
-            // Upload files that are not in the remote root
-            var fileToUpload = localFiles.Where(localFile => !IsFileInRemote(localFile, remoteFiles)).ToArray();
+            // Upload files that are in the local root but not in the remote root
+            var fileToUpload = localFiles
+                .Where(localFile => !remoteFiles.ContainsKey(localFile.Key))
+                .Select(item => item.Value)
+                .ToArray();
 
             foreach(var file in fileToUpload)
             {
                 Policy.Handle<Exception>()
                     .Retry(5, (ex, counter) => {
+                        logger.Trace("");   // New Line
                         logger.Trace("An exception occurred: " + ex.GetType());
                         logger.Trace("Retry #" + counter);
                     })
@@ -65,6 +75,7 @@ namespace Mirror2MegaNZ.Logic
                 Policy.Handle<Exception>()
                     .Retry(10, (ex, counter) =>
                     {
+                        logger.Trace("");   // New line
                         logger.Trace("An exception occurred: " + ex.GetType());
                         logger.Trace("Retry #" + counter);
                     })
@@ -109,11 +120,6 @@ namespace Mirror2MegaNZ.Logic
                 _client.UploadAsync(fileStream, remoteFileName, remoteRoot.ObjectValue, notifier).Wait();
             }
             Console.WriteLine();
-        }
-
-        private bool IsFileInRemote(LocalNode localFile, MegaNZTreeNode[] remoteFiles)
-        {
-            return remoteFiles.Any(remoteFile => NodeComparer.AreTheSameFile(remoteFile, localFile));
         }
 
         private bool IsFolderInRemote(LocalNode localFolder, MegaNZTreeNode[] remoteFolders)

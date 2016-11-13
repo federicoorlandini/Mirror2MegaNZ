@@ -3,6 +3,10 @@ using System;
 
 namespace Mirror2MegaNZ.DomainModel
 {
+    /// <summary>
+    /// This is a node in the MegaNZ file system
+    /// </summary>
+    /// <seealso cref="CG.Web.MegaApiClient.INode" />
     public class MegaNZNode : INode
     {
         public string Id { get; set; }

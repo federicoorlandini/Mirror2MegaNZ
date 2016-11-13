@@ -33,7 +33,7 @@ namespace Mirror2MegaNZ.UnitTests
             {
                 ObjectValue = new MegaNZNode {
                     Id = "2",
-                    Name = "RemoteFileNotInLocal.jpeg",
+                    Name = "RemoteFileNotInLocal_[[2016-1-1-0-0-0]].jpeg",
                     Type = NodeType.File
                 }
             };

@@ -46,7 +46,15 @@ namespace Mirror2MegaNZ
             var fileManager = new FileManager();
             var consoleWrapper = new ConsoleWrapper();
             var syncronizer = new Synchronizer(client, fileManager, consoleWrapper);
+            syncronizer.RemoteFileDeletingHandler += Syncronizer_RemoteFileDeletingHandler;
             syncronizer.SyncronizeFolder(localRoot, remoteRoot, logger);
+        }
+
+        private static void Syncronizer_RemoteFileDeletingHandler(object sender, RemoteDeletingEventArgs e)
+        {
+            Console.WriteLine($"Do you want to delete the remote file {e.Filename}? (Y/N)");
+            var result = Console.ReadKey();
+            e.Cancel = result.Key != ConsoleKey.Y;
         }
 
         private static LocalNode GenerateNodesFromFileSystem(string localRootFolder)

@@ -69,6 +69,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="HashGeneratorTests.cs" />
     <Compile Include="NameHandlerTests.cs" />
     <Compile Include="NodeComparerTests.cs" />
     <Compile Include="UpdaterTests.cs" />
