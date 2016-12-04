@@ -16,7 +16,27 @@ namespace Mirror2MegaNZ.DomainModel
         public INode ObjectValue { get; set; }
 
         public MegaNZTreeNode Parent { get; set; }
+
         public List<MegaNZTreeNode> ChildNodes { get; set; }
+
+        /// <summary>
+        /// Gets the path associated with the current tree node.
+        /// </summary>
+        /// <value>
+        /// The path.
+        /// </value>
+        public string Path
+        {
+            get
+            {
+                if( Parent == null )
+                {
+                    return @"\";
+                }
+
+                return Parent.Path + @"\" + ObjectValue.Name;
+            }
+        }
 
         public string NameWithoutLastModification
         {

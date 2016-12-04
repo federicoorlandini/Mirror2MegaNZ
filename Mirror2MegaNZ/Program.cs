@@ -6,11 +6,23 @@ using System.Linq;
 using Mirror2MegaNZ.Configuration;
 using NLog;
 using Mirror2MegaNZ.Logic;
+using System.Collections.Generic;
+using Mirror2MegaNZ.V2.DomainModel;
+using SystemInterface.IO;
+using SystemWrapper.IO;
+using Mirror2MegaNZ.V2.Logic;
 
 namespace Mirror2MegaNZ
 {
     class Program
     {
+        // MIGLIORE SOLUZIONE: invece di creare un albero di nodi e confrontare l'albero del file system
+        // con questo albero dei nodi possiamo:
+        // 1. dal file system creare una lista di nomi di file, comprensivi del path da cui però abbiamo
+        //    rimosso la parte di path relativa alla cartella root the stiamo sincronizzando
+        // 2. dalla lista degli INode remoti, creare una lista di di nomi di file, comprensivi del path
+        // 3. Utilizzando queste due liste, possiamo ottenere in modo semplice la lista dei file da aggiungere e 
+        //    rimuovere da remoto (usando ad esempio la Intersec() e la Except() di LINQ)
         private static Logger logger = LogManager.GetCurrentClassLogger();
 
         static void Main(string[] args)
@@ -30,24 +42,43 @@ namespace Mirror2MegaNZ
 
         private static void ProcessAccount(Account account, ILogger logger)
         {
-            logger.Trace("Reading nodes from the folder {0}", account.LocalRoot);
-            var localRoot = GenerateNodesFromFileSystem(account.LocalRoot);
+            //----------- V1 ------------
+            //logger.Trace("Reading nodes from the folder {0}", account.LocalRoot);
+            //var localRoot = GenerateNodesFromFileSystem(account.LocalRoot);
 
+            //logger.Trace("Reading nodes from MegaNZ");
+            //MegaApiClient client = new MegaApiClient();
+            //client.Login(account.Username, account.Password);
+            //var remoteNodeList = client.GetNodes().ToList();
+
+            //logger.Trace("Building remote node tree");
+            //var treeBuilder = new TreeBuilder();
+            //var remoteRoot = treeBuilder.Build(remoteNodeList);
+
+            //logger.Trace("Starting synchroniziong...");
+            //var fileManager = new FileManager();
+            //var consoleWrapper = new ConsoleWrapper();
+            //var syncronizer = new Synchronizer(client, fileManager, consoleWrapper);
+            //syncronizer.RemoteFileDeletingHandler += Syncronizer_RemoteFileDeletingHandler;
+            //syncronizer.SyncronizeFolder(localRoot, remoteRoot, logger);
+            //----------- End V1 ------------
+            logger.Trace("Reading nodes from the folder {0}", account.LocalRoot);
+            var itemListFromFileSystem = GenerateListFromLocalFolder(account.LocalRoot, account.LocalRoot);
+
+            var itemListFromMegaNz = GenerateListFromMegaNz(account);
+
+
+        }
+
+        private static IEnumerable<MegaNzItem> GenerateListFromMegaNz(Account account)
+        {
             logger.Trace("Reading nodes from MegaNZ");
             MegaApiClient client = new MegaApiClient();
             client.Login(account.Username, account.Password);
             var remoteNodeList = client.GetNodes().ToList();
 
-            logger.Trace("Building remote node tree");
-            var treeBuilder = new TreeBuilder();
-            var remoteRoot = treeBuilder.Build(remoteNodeList);
-
-            logger.Trace("Starting synchroniziong...");
-            var fileManager = new FileManager();
-            var consoleWrapper = new ConsoleWrapper();
-            var syncronizer = new Synchronizer(client, fileManager, consoleWrapper);
-            syncronizer.RemoteFileDeletingHandler += Syncronizer_RemoteFileDeletingHandler;
-            syncronizer.SyncronizeFolder(localRoot, remoteRoot, logger);
+            var generator = new MegaNzItemListGenerator();
+            return generator.Generate(remoteNodeList);
         }
 
         private static void Syncronizer_RemoteFileDeletingHandler(object sender, RemoteDeletingEventArgs e)
@@ -100,6 +131,20 @@ namespace Mirror2MegaNZ
             }
 
             return root;
+        }
+
+        private static List<FileItem> GenerateListFromLocalFolder(string localRootFolder, string basePath)
+        {
+            if (!Directory.Exists(localRootFolder))
+            {
+                var message = string.Format("The local root folder {0} deosn't exist", localRootFolder);
+                throw new InvalidOperationException(message);
+            }
+
+            IDirectoryInfo localRootFolderInfo = new DirectoryInfoWrap(new DirectoryInfo(localRootFolder));
+            var listGenerator = new LocalFileItemListGenerator();
+            var list = listGenerator.Generate(localRootFolderInfo, basePath);
+            return list;
         }
     }
 }
