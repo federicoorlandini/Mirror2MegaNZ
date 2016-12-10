@@ -42,7 +42,8 @@ namespace Mirror2MegaNZ.V2.Logic
             unchecked // Overflow is fine, just wrap
             {
                 int hash = (int)2166136261;
-                hash = (hash * 16777619) ^ obj.Name.ToLower().GetHashCode();
+                var name = obj.Name ?? string.Empty;
+                hash = (hash * 16777619) ^ name.ToLower().GetHashCode();
                 hash = (hash * 16777619) ^ obj.Size.GetHashCode();
                 hash = (hash * 16777619) ^ obj.Type.GetHashCode();
                 if( obj.LastModified.HasValue)

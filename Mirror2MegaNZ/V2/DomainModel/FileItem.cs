@@ -29,16 +29,32 @@ namespace Mirror2MegaNZ.V2.DomainModel
 
         public FileItem(IFileInfo file, string baseFolderPath)
         {
+            if (!CanCreate(file, baseFolderPath))
+            {
+                throw new InvalidOperationException("The FileItem is not child of the base folder");
+            }
+
             Name = file.Name;
             Type = ItemType.File;
 
             baseFolderPath = baseFolderPath.TrimEnd(new[] { '\\' });
             Path = BuildRelativePath(file.FullName, baseFolderPath);
             Size = file.Length;
+            LastModified = new DateTime(file.LastWriteTimeUtc.Year,
+                file.LastWriteTimeUtc.Month,
+                file.LastWriteTimeUtc.Day,
+                file.LastWriteTimeUtc.Hour,
+                file.LastWriteTimeUtc.Minute,
+                file.LastWriteTimeUtc.Second);
         }
 
         public FileItem(IDirectoryInfo folder, string baseFolderPath)
         {
+            if( !CanCreate(folder, baseFolderPath))
+            {
+                throw new InvalidOperationException("The FileItem is not child of the base folder");
+            }
+
             Name = string.Empty;
             Type = ItemType.Folder;
 
@@ -47,9 +63,22 @@ namespace Mirror2MegaNZ.V2.DomainModel
             Size = 0;
         }
 
+        private bool CanCreate(IFileInfo file, string baseFolderPath)
+        {
+            // Can create only if the file is a child of the base folder
+            return file.FullName.Contains(baseFolderPath);
+        }
+
+        private bool CanCreate(IDirectoryInfo folder, string baseFolderPath)
+        {
+            // Can create only if the folder is a child of the base folder
+            return folder.FullName.Contains(baseFolderPath);
+        }
+
         private string BuildRelativePath(string absolutePath, string basePath)
         {
-            return absolutePath.Substring(basePath.Length);
+            var relativePath = absolutePath.Substring(basePath.Length);
+            return string.IsNullOrEmpty(relativePath) ? @"\" : relativePath;
         }
     }
 }

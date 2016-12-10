@@ -65,17 +65,26 @@ namespace Mirror2MegaNZ
             logger.Trace("Reading nodes from the folder {0}", account.LocalRoot);
             var itemListFromFileSystem = GenerateListFromLocalFolder(account.LocalRoot, account.LocalRoot);
 
-            var itemListFromMegaNz = GenerateListFromMegaNz(account);
-
-
-        }
-
-        private static IEnumerable<MegaNzItem> GenerateListFromMegaNz(Account account)
-        {
-            logger.Trace("Reading nodes from MegaNZ");
             MegaApiClient client = new MegaApiClient();
             client.Login(account.Username, account.Password);
-            var remoteNodeList = client.GetNodes().ToList();
+
+            var itemListFromMegaNz = GenerateListFromMegaNz(client).ToList();
+
+            var commandGenerator = new CommandGenerator(account.LocalRoot);
+            var commandList = commandGenerator.GenerateCommandList(itemListFromFileSystem, itemListFromMegaNz);
+
+            var fileManager = new FileManager();
+            var progressNotifier = new ProgressNotifier(new ConsoleWrapper());
+            var executor = new CommandExecutor(client);
+
+            var megaNzItemCollection = new MegaNzItemCollection(itemListFromMegaNz);
+            executor.Execute(commandList, megaNzItemCollection, fileManager, progressNotifier);
+        }
+
+        private static IEnumerable<MegaNzItem> GenerateListFromMegaNz(IMegaApiClient megaApiClient)
+        {
+            logger.Trace("Reading nodes from MegaNZ");
+            var remoteNodeList = megaApiClient.GetNodes().ToList();
 
             var generator = new MegaNzItemListGenerator();
             return generator.Generate(remoteNodeList);

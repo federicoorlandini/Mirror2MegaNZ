@@ -16,11 +16,11 @@ namespace Mirror2MegaNZ.V2.DomainModel
         public long Size { get; private set; }
         public DateTime? LastModified { get; private set;}
 
-        public string MegaNzId { get; private set; }
+        public INode MegaNzNode { get; private set; }
 
-        public MegaNzItem(string megaNzId, string name, ItemType type, string path, long size, DateTime? lastModified = null)
+        public MegaNzItem(INode megaNzNode, string name, ItemType type, string path, long size, DateTime? lastModified = null)
         {
-            MegaNzId = megaNzId;
+            MegaNzNode = megaNzNode;
             Name = name;
             Type = type;
             Path = path;
@@ -30,13 +30,13 @@ namespace Mirror2MegaNZ.V2.DomainModel
 
         public MegaNzItem(INode megaNzNode, Dictionary<string, INode> megaNzNodeCollection)
         {
-            MegaNzId = megaNzNode.Id;
+            MegaNzNode = megaNzNode;
 
             switch (megaNzNode.Type)
             {
                 case NodeType.Directory:
                 case NodeType.Root:
-                    Name = megaNzNode.Name;
+                    Name = megaNzNode.Name ?? string.Empty;
                     Type = ItemType.Folder;
                     Path = BuildPath(megaNzNode, megaNzNodeCollection);
                     Size = 0;
@@ -62,7 +62,7 @@ namespace Mirror2MegaNZ.V2.DomainModel
 
         private string BuildPath(INode megaNzNode, Dictionary<string, INode> megaNzNodeCollection)
         {
-            MegaNzId = megaNzNode.Id;
+            MegaNzNode = megaNzNode;
 
             if (megaNzNode.Type == NodeType.Root)
             {

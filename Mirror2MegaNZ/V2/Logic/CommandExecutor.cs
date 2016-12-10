@@ -1,4 +1,5 @@
 ﻿using CG.Web.MegaApiClient;
+using Mirror2MegaNZ.Logic;
 using Mirror2MegaNZ.V2.DomainModel;
 using Mirror2MegaNZ.V2.DomainModel.Commands;
 using System;
@@ -16,17 +17,22 @@ namespace Mirror2MegaNZ.V2.Logic
     {
         private readonly IMegaApiClient _megaApiClient;
         
-        public CommandExecutor(IMegaApiClient megaApiClient, List<MegaNzItem> remoteItems)
+        public CommandExecutor(IMegaApiClient megaApiClient)
         {
             _megaApiClient = megaApiClient;
-            MegaNzItems = remoteItems;
         }
           
         public List<MegaNzItem> MegaNzItems { get; private set; }
     
-        public void Execute(IEnumerable<ICommand> commands)
+        public void Execute(IEnumerable<ICommand> commands, 
+            IMegaNzItemCollection megaNzItemCollection, 
+            IFileManager fileManager,
+            IProgress<double> progressNotifier)
         {
-
+            foreach(var command in commands)
+            {
+                command.Execute(_megaApiClient, megaNzItemCollection, fileManager, progressNotifier);
+            }
         }
     }
 }

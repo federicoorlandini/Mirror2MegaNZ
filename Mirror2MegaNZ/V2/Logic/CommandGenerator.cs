@@ -41,7 +41,8 @@ namespace Mirror2MegaNZ.V2.Logic
                     case ItemType.File:
                         command = new DeleteFileCommand
                         {
-                            PathToDelete = item.Path
+                            PathToDelete = item.Path,
+                            LastModifiedDate = item.LastModified.Value
                         };
                         break;
 
@@ -70,7 +71,8 @@ namespace Mirror2MegaNZ.V2.Logic
                         command = new UploadFileCommand
                         {
                             SourcePath = LocalBasePath.TrimEnd('\\') + item.Path,
-                            DestinationPath = GetParentFolder(item)
+                            DestinationPath = GetParentFolder(item),
+                            LastModifiedDate = item.LastModified.Value
                         };
                         break;
 

@@ -6,10 +6,9 @@ using Moq;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using FluentAssertions;
+using Mirror2MegaNZ.Logic;
+using System.IO;
 
 namespace Mirror2MegaNZ.UnitTests.V2
 {
@@ -22,10 +21,11 @@ namespace Mirror2MegaNZ.UnitTests.V2
         {
             // Arrange
             const string filename = "File1.jpeg";
+            var sourcePath = @"c:\testing\" + filename;
             // The command list to be executed
             var commandList = new ICommand[] {
                 new UploadFileCommand() {
-                    SourcePath = @"c:\testing\" + filename,
+                    SourcePath = sourcePath,
                     DestinationPath = @"\"
                 }
             };
@@ -34,14 +34,21 @@ namespace Mirror2MegaNZ.UnitTests.V2
             const string rootName = @"\";
             const string rootPath = @"\";
             const string rootMegaNzId = "0";
+            var mockMegaNzNodeForRemoteRoot = new Mock<INode>(MockBehavior.Strict);
+            mockMegaNzNodeForRemoteRoot.SetupGet(m => m.Id).Returns(rootMegaNzId);
             var remoteItems = new List<MegaNzItem> {
-                new MegaNzItem(rootMegaNzId, rootName, ItemType.Folder, rootPath, 0)
+                new MegaNzItem(mockMegaNzNodeForRemoteRoot.Object, rootName, ItemType.Folder, rootPath, 0)
             };
+            var megaNzItemCollection = new MegaNzItemCollection(remoteItems);
+
+            // The name of the uploaded file
+            var lastModifiedDate = new DateTime(2016, 1, 1, 0, 0, 0);
+            var uploadedFileName = NameHandler.BuildRemoteFileName(filename, lastModifiedDate);
 
             const string newFileMegaNzId = "1";
             var mockMegaApiClient = new Mock<IMegaApiClient>(MockBehavior.Strict);
-            mockMegaApiClient.Setup(m => m.Upload(It.IsAny<System.IO.Stream>(), 
-                                                  filename, 
+            mockMegaApiClient.Setup(m => m.Upload(It.IsAny<Stream>(), 
+                                                  uploadedFileName,     // The name will contain the last modified date 
                                                   It.Is<INode>(node => node.Id == rootMegaNzId)))
                              .Returns(new MegaNzNodeMock {
                                  Id = newFileMegaNzId,
@@ -51,12 +58,19 @@ namespace Mirror2MegaNZ.UnitTests.V2
                                  Type = NodeType.File,
                                  LastModificationDate = new DateTime(2016, 1, 1, 0, 0, 0) });
 
+            var mockFileManager = new Mock<IFileManager>(MockBehavior.Strict);
+            mockFileManager.Setup(m => m.GetStreamToReadFile(sourcePath)).Returns((FileStream)null);
+
+            var mockProgrssNotifier = new Mock<IProgress<double>>(MockBehavior.Strict);
+
             // Act
-            var executor = new CommandExecutor(mockMegaApiClient.Object, remoteItems);
-            executor.Execute(commandList);
+            var executor = new CommandExecutor(mockMegaApiClient.Object);
+            executor.Execute(commandList, megaNzItemCollection, mockFileManager.Object, mockProgrssNotifier.Object);
 
             // Assert
             mockMegaApiClient.VerifyAll();
+            mockMegaNzNodeForRemoteRoot.VerifyAll();
+            mockFileManager.VerifyAll();
         }
 
         [Test]
@@ -64,10 +78,12 @@ namespace Mirror2MegaNZ.UnitTests.V2
         {
             // Arrange
             const string filename = "File1.jpeg";
+            var sourcePath = @"c:\testing\" + filename;
+
             // The command list to be executed
             var commandList = new ICommand[] {
                 new UploadFileCommand() {
-                    SourcePath = @"c:\testing\" + filename,
+                    SourcePath = sourcePath,
                     DestinationPath = @"\"
                 }
             };
@@ -76,31 +92,41 @@ namespace Mirror2MegaNZ.UnitTests.V2
             const string rootName = @"\";
             const string rootPath = @"\";
             const string rootMegaNzId = "0";
+            var mockMegaNzNodeForRemoteRoot = new Mock<INode>(MockBehavior.Strict);
+            mockMegaNzNodeForRemoteRoot.SetupGet(m => m.Id).Returns(rootMegaNzId);
             var remoteItems = new List<MegaNzItem> {
-                new MegaNzItem(rootMegaNzId, rootName, ItemType.Folder, rootPath, 0)
+                new MegaNzItem(mockMegaNzNodeForRemoteRoot.Object, rootName, ItemType.Folder, rootPath, 0)
             };
+            var megaNzItemCollection = new MegaNzItemCollection(remoteItems);
 
             const string newFileMegaNzId = "1";
+            var uploadResultNode = new MegaNzNodeMock
+            {
+                Id = newFileMegaNzId,
+                Name = filename,
+                ParentId = rootMegaNzId,
+                Size = 1024,
+                Type = NodeType.File,
+                LastModificationDate = new DateTime(2016, 1, 1, 0, 0, 0)
+            };
+
             var mockMegaApiClient = new Mock<IMegaApiClient>(MockBehavior.Strict);
-            mockMegaApiClient.Setup(m => m.Upload(It.IsAny<System.IO.Stream>(),
+            mockMegaApiClient.Setup(m => m.Upload(It.IsAny<Stream>(),
                                                   filename,
                                                   It.Is<INode>(node => node.Id == rootMegaNzId)))
-                             .Returns(new MegaNzNodeMock
-                             {
-                                 Id = newFileMegaNzId,
-                                 Name = filename,
-                                 ParentId = rootMegaNzId,
-                                 Size = 1024,
-                                 Type = NodeType.File,
-                                 LastModificationDate = new DateTime(2016, 1, 1, 0, 0, 0)
-                             });
+                             .Returns(uploadResultNode);
+
+            var mockFileManager = new Mock<IFileManager>(MockBehavior.Strict);
+            mockFileManager.Setup(m => m.GetStreamToReadFile(sourcePath)).Returns((FileStream)null);
+
+            var mockProgrssNotifier = new Mock<IProgress<double>>(MockBehavior.Strict);
 
             // Act
-            var executor = new CommandExecutor(mockMegaApiClient.Object, remoteItems);
-            executor.Execute(commandList);
+            var executor = new CommandExecutor(mockMegaApiClient.Object);
+            executor.Execute(commandList, megaNzItemCollection, mockFileManager.Object, mockProgrssNotifier.Object);
 
             // Assert
-            executor.MegaNzItems.Should().Contain(item => item.MegaNzId == newFileMegaNzId);
+            executor.MegaNzItems.Should().Contain(item => item.MegaNzNode.Id == newFileMegaNzId);
         }
 
         [Test]

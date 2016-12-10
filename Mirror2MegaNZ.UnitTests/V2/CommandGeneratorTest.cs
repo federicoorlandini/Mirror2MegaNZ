@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using FluentAssertions;
 using Mirror2MegaNZ.V2.DomainModel.Commands;
+using Moq;
+using CG.Web.MegaApiClient;
 
 namespace Mirror2MegaNZ.UnitTests.V2
 {
@@ -29,16 +31,17 @@ namespace Mirror2MegaNZ.UnitTests.V2
             // - Upload \root\File1.jpeg
 
             // Local file structure
+            var lastModifiedDate = new DateTime(2016, 1, 1, 0, 0, 0);
             var localRoot = new FileItem(@"\", ItemType.Folder, @"\", 0);
-            var localFile1 = new FileItem("File1.jpeg", ItemType.File, @"\File1.jpeg", 1024, new DateTime(2017, 1, 1, 0, 0, 0));
+            var localFile1 = new FileItem("File1.jpeg", ItemType.File, @"\File1.jpeg", 1024, lastModifiedDate);
             var localItems = new List<FileItem> {
                 localRoot,
                 localFile1
             };
 
             // Remote file structure
-            const string megaNzIdForRemoteRoot = "0";
-            var remoteRoot = new MegaNzItem(megaNzIdForRemoteRoot, @"\", ItemType.Folder, @"\", 0);
+            var mockMegaNzNode = new Mock<INode>(MockBehavior.Strict);
+            var remoteRoot = new MegaNzItem(mockMegaNzNode.Object, @"\", ItemType.Folder, @"\", 0);
             var remoteItems = new List<MegaNzItem> {
                 remoteRoot
             };
@@ -53,7 +56,10 @@ namespace Mirror2MegaNZ.UnitTests.V2
             commandList[0].Should().BeOfType<UploadFileCommand>();
             var uploadCommand = (UploadFileCommand)commandList[0];
             uploadCommand.DestinationPath.Should().Be(remoteRoot.Path);
-            uploadCommand.SourcePath = localBasePath + localFile1.Path;
+            uploadCommand.SourcePath.Should().Be(localBasePath + localFile1.Path);
+            uploadCommand.LastModifiedDate.Should().Be(lastModifiedDate);
+
+            mockMegaNzNode.VerifyAll();
         }
 
         [Test]
@@ -79,9 +85,13 @@ namespace Mirror2MegaNZ.UnitTests.V2
             };
 
             // Remote file structure
-            const string megaNzIdForRemoteRoot = "0";
-            var remoteRoot = new MegaNzItem(megaNzIdForRemoteRoot, @"\", ItemType.Folder, @"\", 0);
-            var remoteFile1 = new MegaNzItem("1", "File1.jpeg", ItemType.File, @"\\File1.jpeg", 1024, new DateTime(2017, 1, 1, 0, 0, 0));
+            // Root
+            var mockMegaNzNodeForRemoteRoot = new Mock<INode>(MockBehavior.Strict);
+            var remoteRoot = new MegaNzItem(mockMegaNzNodeForRemoteRoot.Object, @"\", ItemType.Folder, @"\", 0);
+            // File1
+            var lastModifiedDate = new DateTime(2017, 1, 1, 0, 0, 0);
+            var mockMegaNzNodeForFile1 = new Mock<INode>(MockBehavior.Strict);
+            var remoteFile1 = new MegaNzItem(mockMegaNzNodeForFile1.Object, "File1.jpeg", ItemType.File, @"\\File1.jpeg", 1024, lastModifiedDate);
             var remoteItems = new List<MegaNzItem> {
                 remoteRoot,
                 remoteFile1
@@ -97,6 +107,10 @@ namespace Mirror2MegaNZ.UnitTests.V2
             commandList[0].Should().BeOfType<DeleteFileCommand>();
             var deleteCommand = (DeleteFileCommand)commandList[0];
             deleteCommand.PathToDelete.Should().Be(remoteFile1.Path);
+            deleteCommand.LastModifiedDate.Should().Be(lastModifiedDate);
+
+            mockMegaNzNodeForRemoteRoot.VerifyAll();
+            mockMegaNzNodeForFile1.VerifyAll();
         }
 
         [Test]
@@ -116,20 +130,23 @@ namespace Mirror2MegaNZ.UnitTests.V2
             
             const string fileName = "File1.jpeg";
             const long size = 1024;
-            var lastMofification = new DateTime(2016, 1, 1, 0, 0, 0);
+            var lastModifiedDate = new DateTime(2016, 1, 1, 0, 0, 0);
 
             // Local file structure
             var localRoot = new FileItem(@"\", ItemType.Folder, @"\", 0);
-            var localFile1 = new FileItem(fileName, ItemType.File, @"\" + fileName, size, lastMofification);
+            var localFile1 = new FileItem(fileName, ItemType.File, @"\" + fileName, size, lastModifiedDate);
             var localItems = new List<FileItem> {
                 localRoot,
                 localFile1
             };
 
             // Remote file structure
-            const string megaNzIdForRemoteRoot = "0";
-            var remoteRoot = new MegaNzItem(megaNzIdForRemoteRoot, @"\", ItemType.Folder, @"\", 0);
-            var remoteFile1 = new MegaNzItem("1", fileName, ItemType.File, @"\" + fileName, size, lastMofification);
+            // Root
+            var mockMegaNzNodeForRemoteRoot = new Mock<INode>(MockBehavior.Strict);
+            var remoteRoot = new MegaNzItem(mockMegaNzNodeForRemoteRoot.Object, @"\", ItemType.Folder, @"\", 0);
+            // File1
+            var mockMegaNzNodeForFile1 = new Mock<INode>(MockBehavior.Strict);
+            var remoteFile1 = new MegaNzItem(mockMegaNzNodeForFile1.Object, fileName, ItemType.File, @"\" + fileName, size, lastModifiedDate);
             var remoteItems = new List<MegaNzItem> {
                 remoteRoot,
                 remoteFile1
@@ -142,6 +159,9 @@ namespace Mirror2MegaNZ.UnitTests.V2
 
             // Assert
             commandList.Should().BeEmpty();
+
+            mockMegaNzNodeForRemoteRoot.VerifyAll();
+            mockMegaNzNodeForFile1.VerifyAll();
         }
 
         [Test]
@@ -163,20 +183,22 @@ namespace Mirror2MegaNZ.UnitTests.V2
 
             const string fileName = "File1.jpeg";
             const long size = 1024;
-            var lastMofification = new DateTime(2016, 1, 1, 0, 0, 0);
+            var lastModifiedDate = new DateTime(2016, 1, 1, 0, 0, 0);
 
             // Local file structure
             var localRoot = new FileItem(@"\", ItemType.Folder, @"\", 0);
-            var localFile1 = new FileItem(fileName, ItemType.File, @"\" + fileName, size, lastMofification);
+            var localFile1 = new FileItem(fileName, ItemType.File, @"\" + fileName, size, lastModifiedDate);
             var localItems = new List<FileItem> {
                 localRoot,
                 localFile1
             };
 
             // Remote file structure
-            const string megaNzIdForRemoteRoot = "0";
-            var remoteRoot = new MegaNzItem(megaNzIdForRemoteRoot, @"\", ItemType.Folder, @"\", 0);
-            var remoteFile1 = new MegaNzItem("1", fileName, ItemType.File, @"\" + fileName, size * 2, lastMofification);
+            var mockMegaNzNodeForRemoteRoot = new Mock<INode>(MockBehavior.Strict);
+            var remoteRoot = new MegaNzItem(mockMegaNzNodeForRemoteRoot.Object, @"\", ItemType.Folder, @"\", 0);
+            // File1
+            var mockMegaNzNodeForFile1 = new Mock<INode>(MockBehavior.Strict);
+            var remoteFile1 = new MegaNzItem(mockMegaNzNodeForFile1.Object, fileName, ItemType.File, @"\" + fileName, size * 2, lastModifiedDate);
             var remoteItems = new List<MegaNzItem> {
                 remoteRoot,
                 remoteFile1
@@ -193,11 +215,16 @@ namespace Mirror2MegaNZ.UnitTests.V2
             commandList[0].Should().BeOfType<DeleteFileCommand>();
             var deleteCommand = (DeleteFileCommand)commandList[0];
             deleteCommand.PathToDelete.Should().Be(remoteFile1.Path);
+            deleteCommand.LastModifiedDate.Should().Be(lastModifiedDate);
 
             commandList[1].Should().BeOfType<UploadFileCommand>();
             var uploadCommand = (UploadFileCommand)commandList[1];
             uploadCommand.DestinationPath.Should().Be(remoteRoot.Path);
             uploadCommand.SourcePath.Should().Be(localBasePath.TrimEnd('\\') + localFile1.Path);
+            uploadCommand.LastModifiedDate.Should().Be(lastModifiedDate);
+
+            mockMegaNzNodeForRemoteRoot.VerifyAll();
+            mockMegaNzNodeForFile1.VerifyAll();
         }
 
         [Test]
@@ -219,20 +246,24 @@ namespace Mirror2MegaNZ.UnitTests.V2
 
             const string fileName = "File1.jpeg";
             const long size = 1024;
-            var lastMofification = new DateTime(2017, 1, 1, 0, 0, 0);
+            var localLastModifiedDate = new DateTime(2017, 1, 1, 0, 0, 0);
 
             // Local file structure
             var localRoot = new FileItem(@"\", ItemType.Folder, @"\", 0);
-            var localFile1 = new FileItem(fileName, ItemType.File, @"\" + fileName, size, lastMofification);
+            var localFile1 = new FileItem(fileName, ItemType.File, @"\" + fileName, size, localLastModifiedDate);
             var localItems = new List<FileItem> {
                 localRoot,
                 localFile1
             };
 
             // Remote file structure
-            const string megaNzIdForRemoteRoot = "0";
-            var remoteRoot = new MegaNzItem(megaNzIdForRemoteRoot, @"\", ItemType.Folder, @"\", 0);
-            var remoteFile1 = new MegaNzItem("1", fileName, ItemType.File, @"\" + fileName, size * 2, lastMofification.AddYears(-1));
+            // Root
+            var mockMegaNzNodeForRemoteRoot = new Mock<INode>(MockBehavior.Strict);
+            var remoteRoot = new MegaNzItem(mockMegaNzNodeForRemoteRoot.Object, @"\", ItemType.Folder, @"\", 0);
+            // File1
+            var remoteLastModifiedDate = localLastModifiedDate.AddYears(-1);
+            var mockMegaNzNodeForFile1 = new Mock<INode>(MockBehavior.Strict);
+            var remoteFile1 = new MegaNzItem(mockMegaNzNodeForFile1.Object, fileName, ItemType.File, @"\" + fileName, size * 2, remoteLastModifiedDate);
             var remoteItems = new List<MegaNzItem> {
                 remoteRoot,
                 remoteFile1
@@ -249,11 +280,16 @@ namespace Mirror2MegaNZ.UnitTests.V2
             commandList[0].Should().BeOfType<DeleteFileCommand>();
             var deleteCommand = (DeleteFileCommand)commandList[0];
             deleteCommand.PathToDelete.Should().Be(remoteFile1.Path);
+            deleteCommand.LastModifiedDate.Should().Be(remoteLastModifiedDate);
 
             commandList[1].Should().BeOfType<UploadFileCommand>();
             var uploadCommand = (UploadFileCommand)commandList[1];
             uploadCommand.DestinationPath.Should().Be(remoteRoot.Path);
             uploadCommand.SourcePath.Should().Be(localBasePath.TrimEnd('\\') + localFile1.Path);
+            uploadCommand.LastModifiedDate.Should().Be(localLastModifiedDate);
+
+            mockMegaNzNodeForRemoteRoot.VerifyAll();
+            mockMegaNzNodeForFile1.VerifyAll();
         }
 
         [Test]
@@ -275,20 +311,24 @@ namespace Mirror2MegaNZ.UnitTests.V2
 
             const string fileName = "File1.jpeg";
             const long size = 1024;
-            var lastMofification = new DateTime(2015, 1, 1, 0, 0, 0);
+            var localLastModifiedDate= new DateTime(2015, 1, 1, 0, 0, 0);
 
             // Local file structure
             var localRoot = new FileItem(@"\", ItemType.Folder, @"\", 0);
-            var localFile1 = new FileItem(fileName, ItemType.File, @"\" + fileName, size, lastMofification);
+            var localFile1 = new FileItem(fileName, ItemType.File, @"\" + fileName, size, localLastModifiedDate);
             var localItems = new List<FileItem> {
                 localRoot,
                 localFile1
             };
 
             // Remote file structure
-            const string megaNzIdForRemoteRoot = "0";
-            var remoteRoot = new MegaNzItem(megaNzIdForRemoteRoot, @"\", ItemType.Folder, @"\", 0);
-            var remoteFile1 = new MegaNzItem("1", fileName, ItemType.File, @"\" + fileName, size * 2, lastMofification.AddYears(1));
+            // Root
+            var mockMegaNzNodeForRemoteRoot = new Mock<INode>(MockBehavior.Strict);
+            var remoteRoot = new MegaNzItem(mockMegaNzNodeForRemoteRoot.Object, @"\", ItemType.Folder, @"\", 0);
+            // File1
+            var mockMegaNzNodeForFile1 = new Mock<INode>(MockBehavior.Strict);
+            var remoteLastModifiedDate = localLastModifiedDate.AddYears(1);
+            var remoteFile1 = new MegaNzItem(mockMegaNzNodeForFile1.Object, fileName, ItemType.File, @"\" + fileName, size * 2, remoteLastModifiedDate);
             var remoteItems = new List<MegaNzItem> {
                 remoteRoot,
                 remoteFile1
@@ -305,11 +345,16 @@ namespace Mirror2MegaNZ.UnitTests.V2
             commandList[0].Should().BeOfType<DeleteFileCommand>();
             var deleteCommand = (DeleteFileCommand)commandList[0];
             deleteCommand.PathToDelete.Should().Be(remoteFile1.Path);
+            deleteCommand.LastModifiedDate.Should().Be(remoteLastModifiedDate);
 
             commandList[1].Should().BeOfType<UploadFileCommand>();
             var uploadCommand = (UploadFileCommand)commandList[1];
             uploadCommand.DestinationPath.Should().Be(remoteRoot.Path);
             uploadCommand.SourcePath.Should().Be(localBasePath.TrimEnd('\\') + localFile1.Path);
+            uploadCommand.LastModifiedDate.Should().Be(localLastModifiedDate);
+
+            mockMegaNzNodeForRemoteRoot.VerifyAll();
+            mockMegaNzNodeForFile1.VerifyAll();
         }
 
         [Test]
@@ -338,8 +383,9 @@ namespace Mirror2MegaNZ.UnitTests.V2
             };
 
             // Remote file structure
-            const string megaNzIdForRemoteRoot = "0";
-            var remoteRoot = new MegaNzItem(megaNzIdForRemoteRoot, @"\", ItemType.Folder, @"\", 0);
+            // Root
+            var mockMegaNzNodeForRemoteRoot = new Mock<INode>(MockBehavior.Strict);
+            var remoteRoot = new MegaNzItem(mockMegaNzNodeForRemoteRoot.Object, @"\", ItemType.Folder, @"\", 0);
             var remoteItems = new List<MegaNzItem> {
                 remoteRoot
             };
@@ -356,6 +402,8 @@ namespace Mirror2MegaNZ.UnitTests.V2
             var createFolderCommand = (CreateFolderCommand)commandList[0];
             createFolderCommand.ParentPath.Should().Be(remoteRoot.Path);
             createFolderCommand.Name.Should().Be(folderName);
+
+            mockMegaNzNodeForRemoteRoot.VerifyAll();
         }
 
         [Test]
@@ -381,10 +429,14 @@ namespace Mirror2MegaNZ.UnitTests.V2
             };
 
             // Remote file structure
-            const string megaNzIdForRemoteRoot = "0";
+            // Root
             const string folderName = "Folder1";
-            var remoteRoot = new MegaNzItem(megaNzIdForRemoteRoot, @"\", ItemType.Folder, @"\", 0);
-            var remoteFolder1 = new MegaNzItem("1", folderName, ItemType.Folder, @"\" + folderName, 0);
+            var mockMegaNzNodeForRemoteRoot = new Mock<INode>(MockBehavior.Strict);
+            var remoteRoot = new MegaNzItem(mockMegaNzNodeForRemoteRoot.Object, @"\", ItemType.Folder, @"\", 0);
+
+            // File1
+            var mockMegaNzNodeForFile1 = new Mock<INode>(MockBehavior.Strict);
+            var remoteFolder1 = new MegaNzItem(mockMegaNzNodeForFile1.Object, folderName, ItemType.Folder, @"\" + folderName, 0);
             var remoteItems = new List<MegaNzItem> {
                 remoteRoot,
                 remoteFolder1
@@ -401,6 +453,9 @@ namespace Mirror2MegaNZ.UnitTests.V2
             commandList[0].Should().BeOfType<DeleteFolderCommand>();
             var deleteFolderCommand = (DeleteFolderCommand)commandList[0];
             deleteFolderCommand.PathToDelete.Should().Be(remoteFolder1.Path);
+
+            mockMegaNzNodeForRemoteRoot.VerifyAll();
+            mockMegaNzNodeForFile1.VerifyAll();
         }
 
         [Test]
@@ -409,29 +464,32 @@ namespace Mirror2MegaNZ.UnitTests.V2
             // Given the following local file structure:
             // root
             //    |
-            //    +--> Folder1 - Last modified 2016-01-01-00-00-00
+            //    +--> Folder1
             //
             // And given the following remote file structure:
             // root
             //    |
-            //    +--> Folder1 - Last modified 2016-01-01-00-00-00
+            //    +--> Folder1
             //
             // Then the generated command list should be empty
 
             // Local file structure
             const string folderName = "Folder1";
-            var lastModified = new DateTime(2016, 1, 1, 0, 0, 0);
             var localRoot = new FileItem(@"\", ItemType.Folder, @"\", 0);
-            var localFolder1 = new FileItem(folderName, ItemType.Folder, @"\" + folderName, 0, lastModified);
+            var localFolder1 = new FileItem(folderName, ItemType.Folder, @"\" + folderName, 0);
             var localItems = new List<FileItem> {
                 localRoot,
                 localFolder1
             };
 
             // Remote file structure
-            const string megaNzIdForRemoteRoot = "0";
-            var remoteRoot = new MegaNzItem(megaNzIdForRemoteRoot, @"\", ItemType.Folder, @"\", 0);
-            var remoteFolder1 = new MegaNzItem("1", folderName, ItemType.Folder, @"\" + folderName, 0, lastModified);
+            // Root
+            var mockMegaNzNodeForRemoteRoot = new Mock<INode>(MockBehavior.Strict);
+            var remoteRoot = new MegaNzItem(mockMegaNzNodeForRemoteRoot.Object, @"\", ItemType.Folder, @"\", 0);
+
+            // Folder1
+            var mockMegaNzNodeForFile1 = new Mock<INode>(MockBehavior.Strict);
+            var remoteFolder1 = new MegaNzItem(mockMegaNzNodeForFile1.Object, folderName, ItemType.Folder, @"\" + folderName, 0);
             var remoteItems = new List<MegaNzItem> {
                 remoteRoot,
                 remoteFolder1
@@ -444,6 +502,9 @@ namespace Mirror2MegaNZ.UnitTests.V2
 
             // Assert
             commandList.Should().BeEmpty();
+
+            mockMegaNzNodeForRemoteRoot.VerifyAll();
+            mockMegaNzNodeForFile1.VerifyAll();
         }
 
         [Test]
@@ -468,10 +529,10 @@ namespace Mirror2MegaNZ.UnitTests.V2
 
             // Local file structure
             const string folderName = "Folder1";
-            var lastModified = new DateTime(2016, 1, 1, 0, 0, 0);
+            var lastModifiedDate = new DateTime(2016, 1, 1, 0, 0, 0);
             var localRoot = new FileItem(@"\", ItemType.Folder, @"\", 0);
-            var localFolder1 = new FileItem(folderName, ItemType.Folder, @"\" + folderName, 0, lastModified);
-            var localFile1 = new FileItem("File1.jpeg", ItemType.File, @"\" + folderName + @"\File1.jpeg", 1024, new DateTime(2016, 1, 1, 0, 0, 0));
+            var localFolder1 = new FileItem(folderName, ItemType.Folder, @"\" + folderName, 0);
+            var localFile1 = new FileItem("File1.jpeg", ItemType.File, @"\" + folderName + @"\File1.jpeg", 1024, lastModifiedDate);
             var localItems = new List<FileItem> {
                 localRoot,
                 localFolder1,
@@ -479,9 +540,13 @@ namespace Mirror2MegaNZ.UnitTests.V2
             };
 
             // Remote file structure
-            const string megaNzIdForRemoteRoot = "0";
-            var remoteRoot = new MegaNzItem(megaNzIdForRemoteRoot, @"\", ItemType.Folder, @"\", 0);
-            var remoteFolder1 = new MegaNzItem("1", folderName, ItemType.Folder, @"\" + folderName, 0, lastModified);
+            // Root
+            var mockMegaNzNodeForRemoteRoot = new Mock<INode>(MockBehavior.Strict);
+            var remoteRoot = new MegaNzItem(mockMegaNzNodeForRemoteRoot.Object, @"\", ItemType.Folder, @"\", 0);
+
+            // Folder1
+            var mockMegaNzNodeForFolder1 = new Mock<INode>(MockBehavior.Strict);
+            var remoteFolder1 = new MegaNzItem(mockMegaNzNodeForFolder1.Object, folderName, ItemType.Folder, @"\" + folderName, 0, lastModifiedDate);
             var remoteItems = new List<MegaNzItem> {
                 remoteRoot,
                 remoteFolder1
@@ -499,6 +564,10 @@ namespace Mirror2MegaNZ.UnitTests.V2
             var uploadCommand = (UploadFileCommand)commandList[0];
             uploadCommand.SourcePath.Should().Be(@"c:\testing\Folder1\File1.jpeg");
             uploadCommand.DestinationPath.Should().Be(@"\Folder1\");
+            uploadCommand.LastModifiedDate.Should().Be(lastModifiedDate);
+
+            mockMegaNzNodeForRemoteRoot.VerifyAll();
+            mockMegaNzNodeForFolder1.VerifyAll();
         }
 
         [Test]
@@ -521,19 +590,26 @@ namespace Mirror2MegaNZ.UnitTests.V2
 
             // Local file structure
             const string folderName = "Folder1";
-            var lastModified = new DateTime(2016, 1, 1, 0, 0, 0);
             var localRoot = new FileItem(@"\", ItemType.Folder, @"\", 0);
-            var localFolder1 = new FileItem(folderName, ItemType.Folder, @"\" + folderName, 0, lastModified);
+            var localFolder1 = new FileItem(folderName, ItemType.Folder, @"\" + folderName, 0);
             var localItems = new List<FileItem> {
                 localRoot,
                 localFolder1
             };
 
             // Remote file structure
-            const string megaNzIdForRemoteRoot = "0";
-            var remoteRoot = new MegaNzItem(megaNzIdForRemoteRoot, @"\", ItemType.Folder, @"\", 0);
-            var remoteFolder1 = new MegaNzItem("1", folderName, ItemType.Folder, @"\" + folderName, 0, lastModified);
-            var remoteFile1 = new MegaNzItem("2", "File1.jpeg", ItemType.File, @"\" + folderName + @"\File1.jpeg", 1024, new DateTime(2016, 1, 1, 0, 0, 0));
+            // Root
+            var mockMegaNzNodeForRemoteRoot = new Mock<INode>(MockBehavior.Strict);
+            var remoteRoot = new MegaNzItem(mockMegaNzNodeForRemoteRoot.Object, @"\", ItemType.Folder, @"\", 0);
+
+            // Folder1
+            var mockMegaNzNodeForRemoteFolder1 = new Mock<INode>(MockBehavior.Strict);
+            var remoteFolder1 = new MegaNzItem(mockMegaNzNodeForRemoteFolder1.Object, folderName, ItemType.Folder, @"\" + folderName, 0);
+
+            // File1
+            var mockMegaNzNodeForRemoteFile1 = new Mock<INode>(MockBehavior.Strict);
+            var lastModifiedDate = new DateTime(2016, 1, 1, 0, 0, 0);
+            var remoteFile1 = new MegaNzItem(mockMegaNzNodeForRemoteFile1.Object, "File1.jpeg", ItemType.File, @"\" + folderName + @"\File1.jpeg", 1024, lastModifiedDate);
             var remoteItems = new List<MegaNzItem> {
                 remoteRoot,
                 remoteFolder1,
@@ -551,6 +627,11 @@ namespace Mirror2MegaNZ.UnitTests.V2
             commandList[0].Should().BeOfType<DeleteFileCommand>();
             var deleteCommand = (DeleteFileCommand)commandList[0];
             deleteCommand.PathToDelete.Should().Be(@"\Folder1\File1.jpeg");
+            deleteCommand.LastModifiedDate.Should().Be(lastModifiedDate);
+
+            mockMegaNzNodeForRemoteRoot.VerifyAll();
+            mockMegaNzNodeForRemoteFolder1.VerifyAll();
+            mockMegaNzNodeForRemoteFile1.VerifyAll();
         }
 
         [Test]
@@ -575,12 +656,12 @@ namespace Mirror2MegaNZ.UnitTests.V2
             const string fileName = "File1.jpeg";
             const long size = 1024;
             const string folderName = "Folder1";
-            var lastModified = new DateTime(2016, 1, 1, 0, 0, 0);
+            var lastModifiedDate = new DateTime(2016, 1, 1, 0, 0, 0);
 
             // Local file structure
             var localRoot = new FileItem(@"\", ItemType.Folder, @"\", 0);
-            var localFolder1 = new FileItem(folderName, ItemType.Folder, @"\" + folderName, 0, lastModified);
-            var localFile1 = new FileItem(fileName, ItemType.File, @"\" + fileName, size, lastModified);
+            var localFolder1 = new FileItem(folderName, ItemType.Folder, @"\" + folderName, 0);
+            var localFile1 = new FileItem(fileName, ItemType.File, @"\" + fileName, size, lastModifiedDate);
             var localItems = new List<FileItem> {
                 localRoot,
                 localFolder1,
@@ -588,10 +669,17 @@ namespace Mirror2MegaNZ.UnitTests.V2
             };
 
             // Remote file structure
-            const string megaNzIdForRemoteRoot = "0";
-            var remoteRoot = new MegaNzItem(megaNzIdForRemoteRoot, @"\", ItemType.Folder, @"\", 0);
-            var remoteFolder1 = new MegaNzItem("1", folderName, ItemType.Folder, @"\" + folderName, 0, lastModified);
-            var remoteFile1 = new MegaNzItem("1", fileName, ItemType.File, @"\" + fileName, size, lastModified);
+            // Root
+            var mockMegaNzNodeForRemoteRoot = new Mock<INode>(MockBehavior.Strict);
+            var remoteRoot = new MegaNzItem(mockMegaNzNodeForRemoteRoot.Object, @"\", ItemType.Folder, @"\", 0);
+
+            // Folder1
+            var mockMegaNzNodeForRemoteFolder1 = new Mock<INode>(MockBehavior.Strict);
+            var remoteFolder1 = new MegaNzItem(mockMegaNzNodeForRemoteFolder1.Object, folderName, ItemType.Folder, @"\" + folderName, 0);
+
+            // File1
+            var mockMegaNzNodeForRemoteFile1 = new Mock<INode>(MockBehavior.Strict);
+            var remoteFile1 = new MegaNzItem(mockMegaNzNodeForRemoteFile1.Object, fileName, ItemType.File, @"\" + fileName, size, lastModifiedDate);
             var remoteItems = new List<MegaNzItem> {
                 remoteRoot,
                 remoteFolder1,
@@ -605,6 +693,10 @@ namespace Mirror2MegaNZ.UnitTests.V2
 
             // Assert
             commandList.Should().BeEmpty();
+
+            mockMegaNzNodeForRemoteRoot.VerifyAll();
+            mockMegaNzNodeForRemoteFolder1.VerifyAll();
+            mockMegaNzNodeForRemoteFile1.VerifyAll();
         }
 
         [Test]
@@ -631,12 +723,12 @@ namespace Mirror2MegaNZ.UnitTests.V2
             const string fileName = "File1.jpeg";
             const long size = 1024;
             const string folderName = "Folder1";
-            var lastModified = new DateTime(2016, 1, 1, 0, 0, 0);
+            var lastModifiedDate = new DateTime(2016, 1, 1, 0, 0, 0);
 
             // Local file structure
             var localRoot = new FileItem(@"\", ItemType.Folder, @"\", 0);
-            var localFolder1 = new FileItem(folderName, ItemType.Folder, @"\" + folderName, 0, lastModified);
-            var localFile1 = new FileItem(fileName, ItemType.File, @"\" + folderName + @"\" + fileName, size * 2, lastModified);
+            var localFolder1 = new FileItem(folderName, ItemType.Folder, @"\" + folderName, 0);
+            var localFile1 = new FileItem(fileName, ItemType.File, @"\" + folderName + @"\" + fileName, size * 2, lastModifiedDate);
             var localItems = new List<FileItem> {
                 localRoot,
                 localFolder1,
@@ -644,10 +736,17 @@ namespace Mirror2MegaNZ.UnitTests.V2
             };
 
             // Remote file structure
-            const string megaNzIdForRemoteRoot = "0";
-            var remoteRoot = new MegaNzItem(megaNzIdForRemoteRoot, @"\", ItemType.Folder, @"\", 0);
-            var remoteFolder1 = new MegaNzItem("1", folderName, ItemType.Folder, @"\" + folderName, 0, lastModified);
-            var remoteFile1 = new MegaNzItem("1", fileName, ItemType.File, @"\" + folderName + @"\" + fileName, size, lastModified);
+            // Root
+            var mockMegaNzNodeForRemoteRoot = new Mock<INode>(MockBehavior.Strict);
+            var remoteRoot = new MegaNzItem(mockMegaNzNodeForRemoteRoot.Object, @"\", ItemType.Folder, @"\", 0);
+
+            // Folder1
+            var mockMegaNzNodeForRemoteFolder1 = new Mock<INode>(MockBehavior.Strict);
+            var remoteFolder1 = new MegaNzItem(mockMegaNzNodeForRemoteFolder1.Object, folderName, ItemType.Folder, @"\" + folderName, 0);
+
+            // File1
+            var mockMegaNzNodeForRemoteFile1 = new Mock<INode>(MockBehavior.Strict);
+            var remoteFile1 = new MegaNzItem(mockMegaNzNodeForRemoteFile1.Object, fileName, ItemType.File, @"\" + folderName + @"\" + fileName, size, lastModifiedDate);
             var remoteItems = new List<MegaNzItem> {
                 remoteRoot,
                 remoteFolder1,
@@ -665,11 +764,17 @@ namespace Mirror2MegaNZ.UnitTests.V2
             commandList[0].Should().BeOfType<DeleteFileCommand>();
             var deleteCommand = (DeleteFileCommand)commandList[0];
             deleteCommand.PathToDelete.Should().Be(@"\Folder1\File1.jpeg");
+            deleteCommand.LastModifiedDate.Should().Be(lastModifiedDate);
 
             commandList[1].Should().BeOfType<UploadFileCommand>();
             var uploadCommand = (UploadFileCommand)commandList[1];
             uploadCommand.SourcePath.Should().Be(@"c:\testing\Folder1\File1.jpeg");
             uploadCommand.DestinationPath.Should().Be(@"\Folder1\");
+            uploadCommand.LastModifiedDate.Should().Be(lastModifiedDate);
+
+            mockMegaNzNodeForRemoteRoot.VerifyAll();
+            mockMegaNzNodeForRemoteFolder1.VerifyAll();
+            mockMegaNzNodeForRemoteFile1.VerifyAll();
         }
 
         [Test]
@@ -696,12 +801,12 @@ namespace Mirror2MegaNZ.UnitTests.V2
             const string fileName = "File1.jpeg";
             const long size = 1024;
             const string folderName = "Folder1";
-            var lastModified = new DateTime(2017, 1, 1, 0, 0, 0);
+            var localLastModifiedDate = new DateTime(2017, 1, 1, 0, 0, 0);
 
             // Local file structure
             var localRoot = new FileItem(@"\", ItemType.Folder, @"\", 0);
-            var localFolder1 = new FileItem(folderName, ItemType.Folder, @"\" + folderName, 0, lastModified);
-            var localFile1 = new FileItem(fileName, ItemType.File, @"\" + folderName + @"\" + fileName, size, lastModified);
+            var localFolder1 = new FileItem(folderName, ItemType.Folder, @"\" + folderName, 0);
+            var localFile1 = new FileItem(fileName, ItemType.File, @"\" + folderName + @"\" + fileName, size, localLastModifiedDate);
             var localItems = new List<FileItem> {
                 localRoot,
                 localFolder1,
@@ -709,10 +814,18 @@ namespace Mirror2MegaNZ.UnitTests.V2
             };
 
             // Remote file structure
-            const string megaNzIdForRemoteRoot = "0";
-            var remoteRoot = new MegaNzItem(megaNzIdForRemoteRoot, @"\", ItemType.Folder, @"\", 0);
-            var remoteFolder1 = new MegaNzItem("1", folderName, ItemType.Folder, @"\" + folderName, 0, lastModified);
-            var remoteFile1 = new MegaNzItem("1", fileName, ItemType.File, @"\" + folderName + @"\" + fileName, size, lastModified.AddYears(-1));
+            // Root
+            var mockMegaNzNodeForRemoteRoot = new Mock<INode>(MockBehavior.Strict);
+            var remoteRoot = new MegaNzItem(mockMegaNzNodeForRemoteRoot.Object, @"\", ItemType.Folder, @"\", 0);
+
+            // Folder1
+            var mockMegaNzNodeForRemoteFolder1 = new Mock<INode>(MockBehavior.Strict);
+            var remoteFolder1 = new MegaNzItem(mockMegaNzNodeForRemoteFolder1.Object, folderName, ItemType.Folder, @"\" + folderName, 0);
+
+            // File1
+            var mockMegaNzNodeForRemoteFile1 = new Mock<INode>(MockBehavior.Strict);
+            var remoteLastModifiedDate = localLastModifiedDate.AddYears(-1);
+            var remoteFile1 = new MegaNzItem(mockMegaNzNodeForRemoteFile1.Object, fileName, ItemType.File, @"\" + folderName + @"\" + fileName, size, remoteLastModifiedDate);
             var remoteItems = new List<MegaNzItem> {
                 remoteRoot,
                 remoteFolder1,
@@ -730,11 +843,17 @@ namespace Mirror2MegaNZ.UnitTests.V2
             commandList[0].Should().BeOfType<DeleteFileCommand>();
             var deleteCommand = (DeleteFileCommand)commandList[0];
             deleteCommand.PathToDelete.Should().Be(@"\Folder1\File1.jpeg");
+            deleteCommand.LastModifiedDate.Should().Be(remoteLastModifiedDate);
 
             commandList[1].Should().BeOfType<UploadFileCommand>();
             var uploadCommand = (UploadFileCommand)commandList[1];
             uploadCommand.SourcePath.Should().Be(@"c:\testing\Folder1\File1.jpeg");
             uploadCommand.DestinationPath.Should().Be(@"\Folder1\");
+            uploadCommand.LastModifiedDate.Should().Be(localLastModifiedDate);
+
+            mockMegaNzNodeForRemoteRoot.VerifyAll();
+            mockMegaNzNodeForRemoteFolder1.VerifyAll();
+            mockMegaNzNodeForRemoteFile1.VerifyAll();
         }
 
         [Test]
@@ -761,12 +880,12 @@ namespace Mirror2MegaNZ.UnitTests.V2
             const string fileName = "File1.jpeg";
             const long size = 1024;
             const string folderName = "Folder1";
-            var lastModified = new DateTime(2016, 1, 1, 0, 0, 0);
+            var localLastModifiedDate = new DateTime(2015, 1, 1, 0, 0, 0);
 
             // Local file structure
             var localRoot = new FileItem(@"\", ItemType.Folder, @"\", 0);
-            var localFolder1 = new FileItem(folderName, ItemType.Folder, @"\" + folderName, 0, lastModified);
-            var localFile1 = new FileItem(fileName, ItemType.File, @"\" + folderName + @"\" + fileName, size, lastModified);
+            var localFolder1 = new FileItem(folderName, ItemType.Folder, @"\" + folderName, 0);
+            var localFile1 = new FileItem(fileName, ItemType.File, @"\" + folderName + @"\" + fileName, size, localLastModifiedDate);
             var localItems = new List<FileItem> {
                 localRoot,
                 localFolder1,
@@ -774,10 +893,18 @@ namespace Mirror2MegaNZ.UnitTests.V2
             };
 
             // Remote file structure
-            const string megaNzIdForRemoteRoot = "0";
-            var remoteRoot = new MegaNzItem(megaNzIdForRemoteRoot, @"\", ItemType.Folder, @"\", 0);
-            var remoteFolder1 = new MegaNzItem("1", folderName, ItemType.Folder, @"\" + folderName, 0, lastModified);
-            var remoteFile1 = new MegaNzItem("1", fileName, ItemType.File, @"\" + folderName + @"\" + fileName, size, lastModified);
+            // Root
+            var mockMegaNzNodeForRemoteRoot = new Mock<INode>(MockBehavior.Strict);
+            var remoteRoot = new MegaNzItem(mockMegaNzNodeForRemoteRoot.Object, @"\", ItemType.Folder, @"\", 0);
+
+            // Folder1
+            var mockMegaNzNodeForRemoteFolder1 = new Mock<INode>(MockBehavior.Strict);
+            var remoteFolder1 = new MegaNzItem(mockMegaNzNodeForRemoteFolder1.Object, folderName, ItemType.Folder, @"\" + folderName, 0);
+
+            // File1
+            var mockMegaNzNodeForRemoteFile1 = new Mock<INode>(MockBehavior.Strict);
+            var remoteLastModifiedDate = localLastModifiedDate.AddYears(1);
+            var remoteFile1 = new MegaNzItem(mockMegaNzNodeForRemoteFile1.Object, fileName, ItemType.File, @"\" + folderName + @"\" + fileName, size, remoteLastModifiedDate);
             var remoteItems = new List<MegaNzItem> {
                 remoteRoot,
                 remoteFolder1,
@@ -791,6 +918,10 @@ namespace Mirror2MegaNZ.UnitTests.V2
 
             // Assert
             commandList.Should().BeEmpty();
+
+            mockMegaNzNodeForRemoteRoot.VerifyAll();
+            mockMegaNzNodeForRemoteFolder1.VerifyAll();
+            mockMegaNzNodeForRemoteFile1.VerifyAll();
         }
     }
 }
