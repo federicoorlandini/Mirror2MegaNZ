@@ -15,12 +15,13 @@ namespace Mirror2MegaNZ.V2.DomainModel.Commands
             IFileManager fileManager,
             IProgress<double> progressNotifier)
         {
-            throw new NotImplementedException();
+            var megaNzNodeToDelete = megaNzItemCollection.GetByPath(PathToDelete);
+            megaApiClient.Delete(megaNzNodeToDelete, true);
         }
 
         public override string ToString()
         {
-            return $"Delte File Command - PathToDelete: {PathToDelete} - LastModifiedDate: {LastModifiedDate.ToString()}";
+            return $"Delete File Command - PathToDelete: {PathToDelete} - LastModifiedDate: {LastModifiedDate.ToString()}";
         }
     }
 }

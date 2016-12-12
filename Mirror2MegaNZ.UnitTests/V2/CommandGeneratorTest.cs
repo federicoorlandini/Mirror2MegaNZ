@@ -32,8 +32,8 @@ namespace Mirror2MegaNZ.UnitTests.V2
 
             // Local file structure
             var lastModifiedDate = new DateTime(2016, 1, 1, 0, 0, 0);
-            var localRoot = new FileItem(@"\", ItemType.Folder, @"\", 0);
-            var localFile1 = new FileItem("File1.jpeg", ItemType.File, @"\File1.jpeg", 1024, lastModifiedDate);
+            var localRoot = new FileItem(ItemType.Folder, @"\", 0);
+            var localFile1 = new FileItem(ItemType.File, @"\File1.jpeg", 1024, lastModifiedDate);
             var localItems = new List<FileItem> {
                 localRoot,
                 localFile1
@@ -79,7 +79,7 @@ namespace Mirror2MegaNZ.UnitTests.V2
             // - Delete \File1.jpeg
 
             // Local file structure
-            var localRoot = new FileItem(@"\", ItemType.Folder, @"\", 0);
+            var localRoot = new FileItem(ItemType.Folder, @"\", 0);
             var localItems = new List<FileItem> {
                 localRoot
             };
@@ -133,8 +133,8 @@ namespace Mirror2MegaNZ.UnitTests.V2
             var lastModifiedDate = new DateTime(2016, 1, 1, 0, 0, 0);
 
             // Local file structure
-            var localRoot = new FileItem(@"\", ItemType.Folder, @"\", 0);
-            var localFile1 = new FileItem(fileName, ItemType.File, @"\" + fileName, size, lastModifiedDate);
+            var localRoot = new FileItem(ItemType.Folder, @"\", 0);
+            var localFile1 = new FileItem(ItemType.File, @"\" + fileName, size, lastModifiedDate);
             var localItems = new List<FileItem> {
                 localRoot,
                 localFile1
@@ -186,8 +186,8 @@ namespace Mirror2MegaNZ.UnitTests.V2
             var lastModifiedDate = new DateTime(2016, 1, 1, 0, 0, 0);
 
             // Local file structure
-            var localRoot = new FileItem(@"\", ItemType.Folder, @"\", 0);
-            var localFile1 = new FileItem(fileName, ItemType.File, @"\" + fileName, size, lastModifiedDate);
+            var localRoot = new FileItem(ItemType.Folder, @"\", 0);
+            var localFile1 = new FileItem(ItemType.File, @"\" + fileName, size, lastModifiedDate);
             var localItems = new List<FileItem> {
                 localRoot,
                 localFile1
@@ -249,8 +249,8 @@ namespace Mirror2MegaNZ.UnitTests.V2
             var localLastModifiedDate = new DateTime(2017, 1, 1, 0, 0, 0);
 
             // Local file structure
-            var localRoot = new FileItem(@"\", ItemType.Folder, @"\", 0);
-            var localFile1 = new FileItem(fileName, ItemType.File, @"\" + fileName, size, localLastModifiedDate);
+            var localRoot = new FileItem(ItemType.Folder, @"\", 0);
+            var localFile1 = new FileItem(ItemType.File, @"\" + fileName, size, localLastModifiedDate);
             var localItems = new List<FileItem> {
                 localRoot,
                 localFile1
@@ -314,8 +314,8 @@ namespace Mirror2MegaNZ.UnitTests.V2
             var localLastModifiedDate= new DateTime(2015, 1, 1, 0, 0, 0);
 
             // Local file structure
-            var localRoot = new FileItem(@"\", ItemType.Folder, @"\", 0);
-            var localFile1 = new FileItem(fileName, ItemType.File, @"\" + fileName, size, localLastModifiedDate);
+            var localRoot = new FileItem(ItemType.Folder, @"\", 0);
+            var localFile1 = new FileItem(ItemType.File, @"\" + fileName, size, localLastModifiedDate);
             var localItems = new List<FileItem> {
                 localRoot,
                 localFile1
@@ -375,8 +375,8 @@ namespace Mirror2MegaNZ.UnitTests.V2
 
             // Local file structure
             const string folderName = "folder1";
-            var localRoot = new FileItem(@"\", ItemType.Folder, @"\", 0);
-            var localFolder1 = new FileItem(folderName, ItemType.Folder, @"\" + folderName, 0, DateTime.Now);
+            var localRoot = new FileItem(ItemType.Folder, @"\", 0);
+            var localFolder1 = new FileItem(ItemType.Folder, @"\" + folderName, 0, DateTime.Now);
             var localItems = new List<FileItem> {
                 localRoot,
                 localFolder1
@@ -423,7 +423,7 @@ namespace Mirror2MegaNZ.UnitTests.V2
             // DeleteFolder \Folder1
             
             // Local file structure
-            var localRoot = new FileItem(@"\", ItemType.Folder, @"\", 0);
+            var localRoot = new FileItem(ItemType.Folder, @"\", 0);
             var localItems = new List<FileItem> {
                 localRoot
             };
@@ -475,8 +475,8 @@ namespace Mirror2MegaNZ.UnitTests.V2
 
             // Local file structure
             const string folderName = "Folder1";
-            var localRoot = new FileItem(@"\", ItemType.Folder, @"\", 0);
-            var localFolder1 = new FileItem(folderName, ItemType.Folder, @"\" + folderName, 0);
+            var localRoot = new FileItem(ItemType.Folder, @"\", 0);
+            var localFolder1 = new FileItem(ItemType.Folder, @"\" + folderName, 0);
             var localItems = new List<FileItem> {
                 localRoot,
                 localFolder1
@@ -530,9 +530,9 @@ namespace Mirror2MegaNZ.UnitTests.V2
             // Local file structure
             const string folderName = "Folder1";
             var lastModifiedDate = new DateTime(2016, 1, 1, 0, 0, 0);
-            var localRoot = new FileItem(@"\", ItemType.Folder, @"\", 0);
-            var localFolder1 = new FileItem(folderName, ItemType.Folder, @"\" + folderName, 0);
-            var localFile1 = new FileItem("File1.jpeg", ItemType.File, @"\" + folderName + @"\File1.jpeg", 1024, lastModifiedDate);
+            var localRoot = new FileItem(ItemType.Folder, @"\", 0);
+            var localFolder1 = new FileItem(ItemType.Folder, @"\" + folderName, 0);
+            var localFile1 = new FileItem(ItemType.File, @"\" + folderName + @"\File1.jpeg", 1024, lastModifiedDate);
             var localItems = new List<FileItem> {
                 localRoot,
                 localFolder1,
@@ -590,8 +590,8 @@ namespace Mirror2MegaNZ.UnitTests.V2
 
             // Local file structure
             const string folderName = "Folder1";
-            var localRoot = new FileItem(@"\", ItemType.Folder, @"\", 0);
-            var localFolder1 = new FileItem(folderName, ItemType.Folder, @"\" + folderName, 0);
+            var localRoot = new FileItem(ItemType.Folder, @"\", 0);
+            var localFolder1 = new FileItem(ItemType.Folder, @"\" + folderName, 0);
             var localItems = new List<FileItem> {
                 localRoot,
                 localFolder1
@@ -659,9 +659,9 @@ namespace Mirror2MegaNZ.UnitTests.V2
             var lastModifiedDate = new DateTime(2016, 1, 1, 0, 0, 0);
 
             // Local file structure
-            var localRoot = new FileItem(@"\", ItemType.Folder, @"\", 0);
-            var localFolder1 = new FileItem(folderName, ItemType.Folder, @"\" + folderName, 0);
-            var localFile1 = new FileItem(fileName, ItemType.File, @"\" + fileName, size, lastModifiedDate);
+            var localRoot = new FileItem(ItemType.Folder, @"\", 0);
+            var localFolder1 = new FileItem(ItemType.Folder, @"\" + folderName, 0);
+            var localFile1 = new FileItem(ItemType.File, @"\" + fileName, size, lastModifiedDate);
             var localItems = new List<FileItem> {
                 localRoot,
                 localFolder1,
@@ -726,9 +726,9 @@ namespace Mirror2MegaNZ.UnitTests.V2
             var lastModifiedDate = new DateTime(2016, 1, 1, 0, 0, 0);
 
             // Local file structure
-            var localRoot = new FileItem(@"\", ItemType.Folder, @"\", 0);
-            var localFolder1 = new FileItem(folderName, ItemType.Folder, @"\" + folderName, 0);
-            var localFile1 = new FileItem(fileName, ItemType.File, @"\" + folderName + @"\" + fileName, size * 2, lastModifiedDate);
+            var localRoot = new FileItem(ItemType.Folder, @"\", 0);
+            var localFolder1 = new FileItem(ItemType.Folder, @"\" + folderName, 0);
+            var localFile1 = new FileItem(ItemType.File, @"\" + folderName + @"\" + fileName, size * 2, lastModifiedDate);
             var localItems = new List<FileItem> {
                 localRoot,
                 localFolder1,
@@ -804,9 +804,9 @@ namespace Mirror2MegaNZ.UnitTests.V2
             var localLastModifiedDate = new DateTime(2017, 1, 1, 0, 0, 0);
 
             // Local file structure
-            var localRoot = new FileItem(@"\", ItemType.Folder, @"\", 0);
-            var localFolder1 = new FileItem(folderName, ItemType.Folder, @"\" + folderName, 0);
-            var localFile1 = new FileItem(fileName, ItemType.File, @"\" + folderName + @"\" + fileName, size, localLastModifiedDate);
+            var localRoot = new FileItem(ItemType.Folder, @"\", 0);
+            var localFolder1 = new FileItem(ItemType.Folder, @"\" + folderName, 0);
+            var localFile1 = new FileItem(ItemType.File, @"\" + folderName + @"\" + fileName, size, localLastModifiedDate);
             var localItems = new List<FileItem> {
                 localRoot,
                 localFolder1,
@@ -883,9 +883,9 @@ namespace Mirror2MegaNZ.UnitTests.V2
             var localLastModifiedDate = new DateTime(2015, 1, 1, 0, 0, 0);
 
             // Local file structure
-            var localRoot = new FileItem(@"\", ItemType.Folder, @"\", 0);
-            var localFolder1 = new FileItem(folderName, ItemType.Folder, @"\" + folderName, 0);
-            var localFile1 = new FileItem(fileName, ItemType.File, @"\" + folderName + @"\" + fileName, size, localLastModifiedDate);
+            var localRoot = new FileItem(ItemType.Folder, @"\", 0);
+            var localFolder1 = new FileItem(ItemType.Folder, @"\" + folderName, 0);
+            var localFile1 = new FileItem(ItemType.File, @"\" + folderName + @"\" + fileName, size, localLastModifiedDate);
             var localItems = new List<FileItem> {
                 localRoot,
                 localFolder1,

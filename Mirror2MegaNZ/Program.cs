@@ -74,6 +74,12 @@ namespace Mirror2MegaNZ
             var commandGenerator = new CommandGenerator(account.LocalRoot);
             var commandList = commandGenerator.GenerateCommandList(itemListFromFileSystem, itemListFromMegaNz);
 
+            if( !commandList.Any() )
+            {
+                Console.WriteLine("Nothing to do here. Exiting.....");
+                return;
+            }
+
             ShowCommandList(commandList);
 
             var fileManager = new FileManager();

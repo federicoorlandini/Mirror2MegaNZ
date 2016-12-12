@@ -17,7 +17,6 @@ namespace Mirror2MegaNZ.UnitTests.V2
         {
             var lastModifiedDate = new DateTimeWrap(new DateTime(2016, 1, 1, 0, 0, 0));
             var mockFileInfo = new Mock<IFileInfo>();
-            mockFileInfo.SetupGet(m => m.Name).Returns("testfile.jpeg");
             mockFileInfo.SetupGet(m => m.FullName).Returns(@"c:\folder1\folder2\testfile.jpeg");
             mockFileInfo.SetupGet(m => m.Length).Returns(1024);
             mockFileInfo.SetupGet(m => m.LastWriteTimeUtc).Returns(lastModifiedDate);

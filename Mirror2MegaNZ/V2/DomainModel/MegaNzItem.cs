@@ -70,8 +70,6 @@ namespace Mirror2MegaNZ.V2.DomainModel
 
         private string BuildPath(INode megaNzNode, Dictionary<string, INode> megaNzNodeCollection)
         {
-            MegaNzNode = megaNzNode;
-
             if (megaNzNode.Type == NodeType.Root)
             {
                 return @"\";

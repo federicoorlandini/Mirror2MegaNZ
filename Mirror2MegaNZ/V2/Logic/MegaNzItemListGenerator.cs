@@ -16,10 +16,9 @@ namespace Mirror2MegaNZ.V2.Logic
     {
         public IEnumerable<MegaNzItem> Generate(IEnumerable<INode> nodes)
         {
-            var nodeCollection = nodes.ToDictionary(node => node.Id);
+            var nodeCollection = nodes.ToDictionary(node => node.Id, node => node);
 
             return nodes
-                .Where(node => node.Type != NodeType.Inbox && node.Type != NodeType.Trash)
                 .Select(node => new MegaNzItem(node, nodeCollection))
                 .ToArray();
         }

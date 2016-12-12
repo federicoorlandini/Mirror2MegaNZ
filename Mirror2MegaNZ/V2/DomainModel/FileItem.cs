@@ -1,26 +1,29 @@
-﻿using CG.Web.MegaApiClient;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
 using SystemInterface.IO;
-using SystemWrapper.IO;
 
 namespace Mirror2MegaNZ.V2.DomainModel
 {
     internal class FileItem : IItem
     {
-        public string Name { get; private set; }
         public ItemType Type { get; private set; }
         public string Path { get; private set; }
         public long Size { get; private set; }
         public DateTime? LastModified { get; private set; }
 
-        public FileItem(string name, ItemType type, string path, long size, DateTime? lastModified = null)
+        public string Name
         {
-            Name = name;
+            get
+            {
+                if ( Path == @"\" )
+                {
+                    return @"\";
+                }
+                return System.IO.Path.GetFileName(Path);
+            }
+        }
+
+        public FileItem(ItemType type, string path, long size, DateTime? lastModified = null)
+        {
             Type = type;
             Path = path;
             Size = size;
@@ -34,7 +37,6 @@ namespace Mirror2MegaNZ.V2.DomainModel
                 throw new InvalidOperationException("The FileItem is not child of the base folder");
             }
 
-            Name = file.Name;
             Type = ItemType.File;
 
             baseFolderPath = baseFolderPath.TrimEnd(new[] { '\\' });
@@ -58,7 +60,6 @@ namespace Mirror2MegaNZ.V2.DomainModel
             Type = ItemType.Folder;
             baseFolderPath = baseFolderPath.TrimEnd(new[] { '\\' });
             Path = BuildRelativePath(folder.FullName, baseFolderPath);
-            Name = folder.Name ?? string.Empty;     // We need this to be able to compare with a Root Node from MegaNz
             Size = 0;
         }
 

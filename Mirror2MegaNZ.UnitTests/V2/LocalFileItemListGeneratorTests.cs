@@ -47,7 +47,7 @@ namespace Mirror2MegaNZ.UnitTests.V2
             result.Count.Should().Be(2);
             result[0].Name.Should().Be(@"\");
             result[0].Path.Should().Be(@"\");
-            result[1].Name.Should().Be("folder");
+            result[1].Name.Should().Be("folder2");
             result[1].Path.Should().Be(@"\folder2");
         }
 
