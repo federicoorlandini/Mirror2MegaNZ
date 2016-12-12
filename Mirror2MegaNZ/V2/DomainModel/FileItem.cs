@@ -54,12 +54,11 @@ namespace Mirror2MegaNZ.V2.DomainModel
             {
                 throw new InvalidOperationException("The FileItem is not child of the base folder");
             }
-
-            Name = string.Empty;
+            
             Type = ItemType.Folder;
-
             baseFolderPath = baseFolderPath.TrimEnd(new[] { '\\' });
             Path = BuildRelativePath(folder.FullName, baseFolderPath);
+            Name = folder.Name ?? string.Empty;     // We need this to be able to compare with a Root Node from MegaNz
             Size = 0;
         }
 

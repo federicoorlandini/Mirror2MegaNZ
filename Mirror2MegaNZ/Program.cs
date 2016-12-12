@@ -11,6 +11,7 @@ using Mirror2MegaNZ.V2.DomainModel;
 using SystemInterface.IO;
 using SystemWrapper.IO;
 using Mirror2MegaNZ.V2.Logic;
+using Mirror2MegaNZ.V2.DomainModel.Commands;
 
 namespace Mirror2MegaNZ
 {
@@ -73,6 +74,8 @@ namespace Mirror2MegaNZ
             var commandGenerator = new CommandGenerator(account.LocalRoot);
             var commandList = commandGenerator.GenerateCommandList(itemListFromFileSystem, itemListFromMegaNz);
 
+            ShowCommandList(commandList);
+
             var fileManager = new FileManager();
             var progressNotifier = new ProgressNotifier(new ConsoleWrapper());
             var executor = new CommandExecutor(client);
@@ -81,13 +84,40 @@ namespace Mirror2MegaNZ
             executor.Execute(commandList, megaNzItemCollection, fileManager, progressNotifier);
         }
 
+        private static void ShowCommandList(List<ICommand> commandList)
+        {
+            Console.WriteLine("Command list:");
+            foreach(var command in commandList)
+            {
+                Console.WriteLine(command.ToString());
+            }
+        }
+
         private static IEnumerable<MegaNzItem> GenerateListFromMegaNz(IMegaApiClient megaApiClient)
         {
             logger.Trace("Reading nodes from MegaNZ");
-            var remoteNodeList = megaApiClient.GetNodes().ToList();
+            var remoteNodeList = megaApiClient
+                .GetNodes()
+                .ToList();
+
+            // We need to filter the nodes to remove the TRASH folder, the INBOX folder and
+            // all the files that are their children
+            remoteNodeList = FilterRemoteNodeList(remoteNodeList);
 
             var generator = new MegaNzItemListGenerator();
             return generator.Generate(remoteNodeList);
+        }
+
+        private static List<INode> FilterRemoteNodeList(List<INode> remoteNodeList)
+        {
+            var inboxFolder = remoteNodeList.Single(node => node.Type == NodeType.Inbox);
+            var trashFolder = remoteNodeList.Single(node => node.Type == NodeType.Trash);
+
+            return remoteNodeList.Where(node => node.Id != inboxFolder.Id &&
+                    node.Id != trashFolder.Id &&
+                    node.ParentId != inboxFolder.Id &&
+                    node.ParentId != trashFolder.Id)
+                .ToList();
         }
 
         private static void Syncronizer_RemoteFileDeletingHandler(object sender, RemoteDeletingEventArgs e)

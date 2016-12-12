@@ -56,7 +56,7 @@ namespace Mirror2MegaNZ.UnitTests.V2
             commandList[0].Should().BeOfType<UploadFileCommand>();
             var uploadCommand = (UploadFileCommand)commandList[0];
             uploadCommand.DestinationPath.Should().Be(remoteRoot.Path);
-            uploadCommand.SourcePath.Should().Be(localBasePath + localFile1.Path);
+            uploadCommand.SourcePath.Should().Be(localBasePath.TrimEnd('\\') + localFile1.Path);
             uploadCommand.LastModifiedDate.Should().Be(lastModifiedDate);
 
             mockMegaNzNode.VerifyAll();
@@ -546,7 +546,7 @@ namespace Mirror2MegaNZ.UnitTests.V2
 
             // Folder1
             var mockMegaNzNodeForFolder1 = new Mock<INode>(MockBehavior.Strict);
-            var remoteFolder1 = new MegaNzItem(mockMegaNzNodeForFolder1.Object, folderName, ItemType.Folder, @"\" + folderName, 0, lastModifiedDate);
+            var remoteFolder1 = new MegaNzItem(mockMegaNzNodeForFolder1.Object, folderName, ItemType.Folder, @"\" + folderName, 0);
             var remoteItems = new List<MegaNzItem> {
                 remoteRoot,
                 remoteFolder1
@@ -917,7 +917,18 @@ namespace Mirror2MegaNZ.UnitTests.V2
             var commandList = synchronizer.GenerateCommandList(localItems, remoteItems);
 
             // Assert
-            commandList.Should().BeEmpty();
+            commandList.Count.Should().Be(2);
+
+            commandList[0].Should().BeOfType<DeleteFileCommand>();
+            var deleteFileCommand = (DeleteFileCommand)commandList[0];
+            deleteFileCommand.PathToDelete.Should().Be(@"\Folder1\File1.jpeg");
+            deleteFileCommand.LastModifiedDate.Should().Be(remoteLastModifiedDate);
+
+            commandList[1].Should().BeOfType<UploadFileCommand>();
+            var uploadFileCommand = (UploadFileCommand)commandList[1];
+            uploadFileCommand.SourcePath.Should().Be(localBasePath + folderName + @"\" + fileName);
+            uploadFileCommand.DestinationPath.Should().Be(@"\" + folderName + @"\");
+            uploadFileCommand.LastModifiedDate.Should().Be(localLastModifiedDate);
 
             mockMegaNzNodeForRemoteRoot.VerifyAll();
             mockMegaNzNodeForRemoteFolder1.VerifyAll();

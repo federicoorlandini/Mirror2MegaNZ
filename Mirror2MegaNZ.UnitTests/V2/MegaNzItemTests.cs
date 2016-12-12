@@ -10,28 +10,74 @@ namespace Mirror2MegaNZ.UnitTests.V2
     [Category("V2")]
     public class MegaNzItemTests
     {
+        private readonly MegaNzNodeMock _root = new MegaNzNodeMock
+        {
+            Id = "1",
+            Name = "rootNode",
+            Owner = "User",
+            ParentId = string.Empty,
+            Size = 0,
+            Type = NodeType.Root
+        };
+
         [Test]
         public void Constructor_usingINodeOfTypeRoot_shouldBuildTheCorrectPath()
         {
-            var root = new MegaNzNodeMock
-            {
-                Id = "1",
-                Name = "rootNode",
-                Owner = "User",
-                ParentId = string.Empty,
-                Size = 0,
-                Type = NodeType.Root
-            };
-
+            // Arrange
             var nodeDictionary = new Dictionary<string, INode> {
-                { root.Id, root }
+                { _root.Id, _root }
             };
 
             // Act
-            var rootItem = new MegaNzItem(root, nodeDictionary);
+            var rootItem = new MegaNzItem(_root, nodeDictionary);
 
             // Assert
             rootItem.Path.Should().Be(@"\");
+        }
+
+        [Test]
+        public void Constructor_usingINodeOfTypeRoot_shouldHaveTheCorrectName()
+        {
+            // Arrange
+            var nodeDictionary = new Dictionary<string, INode> {
+                { _root.Id, _root }
+            };
+
+            // Act
+            var rootItem = new MegaNzItem(_root, nodeDictionary);
+
+            // Assert
+            rootItem.Name.Should().Be(@"\");
+        }
+
+        [Test]
+        public void Constructor_usingINodeOfTypeRoot_shouldHaveSizeZero()
+        {
+            // Arrange
+            var nodeDictionary = new Dictionary<string, INode> {
+                { _root.Id, _root }
+            };
+
+            // Act
+            var rootItem = new MegaNzItem(_root, nodeDictionary);
+
+            // Assert
+            rootItem.Size.Should().Be(0);
+        }
+
+        [Test]
+        public void Constructor_usingINodeOfTypeRoot_shouldHaveTheCorrectType()
+        {
+            // Arrange
+            var nodeDictionary = new Dictionary<string, INode> {
+                { _root.Id, _root }
+            };
+
+            // Act
+            var rootItem = new MegaNzItem(_root, nodeDictionary);
+
+            // Assert
+            rootItem.Type.Should().Be(ItemType.Folder);
         }
 
         [Test]
@@ -42,16 +88,6 @@ namespace Mirror2MegaNZ.UnitTests.V2
             //    +--> folder1
             //               +--> folder2
             //                          +--> folder3
-            var root = new MegaNzNodeMock
-            {
-                Id = "1",
-                Name = "rootNode",
-                Owner = "User",
-                ParentId = string.Empty,
-                Size = 0,
-                Type = NodeType.Root
-            };
-
             var folder1 = new MegaNzNodeMock
             {
                 Id = "2",
@@ -83,7 +119,7 @@ namespace Mirror2MegaNZ.UnitTests.V2
             };
 
             var nodeDictionary = new Dictionary<string, INode> {
-                { root.Id, root },
+                { _root.Id, _root },
                 { folder1.Id, folder1 },
                 { folder2.Id, folder2 },
                 { folder3.Id, folder3 }
@@ -104,16 +140,6 @@ namespace Mirror2MegaNZ.UnitTests.V2
             //    +--> folder1
             //               +--> folder2
             //                          +--> file1
-            var root = new MegaNzNodeMock
-            {
-                Id = "1",
-                Name = "rootNode",
-                Owner = "User",
-                ParentId = string.Empty,
-                Size = 0,
-                Type = NodeType.Root
-            };
-
             var folder1 = new MegaNzNodeMock
             {
                 Id = "2",
@@ -145,7 +171,7 @@ namespace Mirror2MegaNZ.UnitTests.V2
             };
 
             var nodeDictionary = new Dictionary<string, INode> {
-                { root.Id, root },
+                { _root.Id, _root },
                 { folder1.Id, folder1 },
                 { folder2.Id, folder2 },
                 { file1.Id, file1 }
@@ -159,23 +185,13 @@ namespace Mirror2MegaNZ.UnitTests.V2
         }
 
         [Test]
-        public void Constructor_usingINodeOfTypeFile_shouldPartTheCorrectLastModificationDatetime()
+        public void Constructor_usingINodeOfTypeFile_shouldParseTheCorrectLastModificationDatetime()
         {
             // We need a structure like this:
             // root
             //    +--> folder1
             //               +--> folder2
             //                          +--> file1
-            var root = new MegaNzNodeMock
-            {
-                Id = "1",
-                Name = "rootNode",
-                Owner = "User",
-                ParentId = string.Empty,
-                Size = 0,
-                Type = NodeType.Root
-            };
-
             var folder1 = new MegaNzNodeMock
             {
                 Id = "2",
@@ -207,7 +223,7 @@ namespace Mirror2MegaNZ.UnitTests.V2
             };
 
             var nodeDictionary = new Dictionary<string, INode> {
-                { root.Id, root },
+                { _root.Id, _root },
                 { folder1.Id, folder1 },
                 { folder2.Id, folder2 },
                 { file1.Id, file1 }

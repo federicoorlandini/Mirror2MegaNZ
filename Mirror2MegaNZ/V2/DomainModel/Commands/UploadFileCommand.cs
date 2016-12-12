@@ -27,9 +27,16 @@ namespace Mirror2MegaNZ.V2.DomainModel.Commands
         {
             using (var filestream = fileManager.GetStreamToReadFile(SourcePath))
             {
+                var sourceFileName = System.IO.Path.GetFileName(SourcePath);
+                var remoteFileName = NameHandler.BuildRemoteFileName(sourceFileName, LastModifiedDate);
                 var parentMegaNzNode = megaNzItemCollection.GetByPath(DestinationPath);
-                megaApiClient.UploadAsync(filestream, SourcePath, parentMegaNzNode, progressNotifier).Wait();
+                megaApiClient.UploadAsync(filestream, remoteFileName, parentMegaNzNode, progressNotifier).Wait();
             }
+        }
+
+        public override string ToString()
+        {
+            return $"Upload File Command - SourcePath: {SourcePath} - DestinationPath: {DestinationPath} - LastModifiedDate: {LastModifiedDate.ToString()}";
         }
     }
 }

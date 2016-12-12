@@ -16,5 +16,10 @@ namespace Mirror2MegaNZ.V2.DomainModel.Commands
         {
             throw new NotImplementedException();
         }
+
+        public override string ToString()
+        {
+            return $"Delte File Command - PathToDelete: {PathToDelete}";
+        }
     }
 }

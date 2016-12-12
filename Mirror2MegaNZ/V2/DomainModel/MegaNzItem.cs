@@ -2,9 +2,6 @@
 using Mirror2MegaNZ.Logic;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Mirror2MegaNZ.V2.DomainModel
 {
@@ -20,6 +17,11 @@ namespace Mirror2MegaNZ.V2.DomainModel
 
         public MegaNzItem(INode megaNzNode, string name, ItemType type, string path, long size, DateTime? lastModified = null)
         {
+            if( type == ItemType.Folder && lastModified != null)
+            {
+                throw new InvalidOperationException("A MegaNzItem that represent a folder cannot have a lastModified date");
+            }
+
             MegaNzNode = megaNzNode;
             Name = name;
             Type = type;
@@ -34,9 +36,15 @@ namespace Mirror2MegaNZ.V2.DomainModel
 
             switch (megaNzNode.Type)
             {
-                case NodeType.Directory:
                 case NodeType.Root:
-                    Name = megaNzNode.Name ?? string.Empty;
+                    Name = @"\";
+                    Type = ItemType.Folder;
+                    Path = @"\";
+                    Size = 0;
+                    break;
+
+                case NodeType.Directory:
+                    Name = megaNzNode.Name;
                     Type = ItemType.Folder;
                     Path = BuildPath(megaNzNode, megaNzNodeCollection);
                     Size = 0;

@@ -30,66 +30,52 @@ namespace Mirror2MegaNZ.V2.Logic
             // We must visit all the tree and compute the path for each node
             //var megaNzNodeIdByPath = remoteItems.ToDictionary(item => item.Path, item => item.MegaNzId);
 
-            // Generate the list of the file and folder to be deleted from remote
+            // Generate the list of the file to be deleted from remote
             var commands = new List<ICommand>();
-            var itemsToDelete = remoteItems.Except(localItems, _equalityComparer).Cast<MegaNzItem>().ToArray();
-            foreach (var item in itemsToDelete)
+            var remoteFileItems = remoteItems.Where(item => item.Type == ItemType.File).ToArray();
+            var localFileItems = localItems.Where(item => item.Type == ItemType.File).ToArray();
+            var filesToDelete = remoteFileItems.Except(localFileItems, _equalityComparer).Cast<MegaNzItem>().ToArray();
+
+            foreach (var file in filesToDelete)
             {
-                ICommand command;
-                switch (item.Type)
-                {
-                    case ItemType.File:
-                        command = new DeleteFileCommand
-                        {
-                            PathToDelete = item.Path,
-                            LastModifiedDate = item.LastModified.Value
-                        };
-                        break;
-
-                    case ItemType.Folder:
-                        command = new DeleteFolderCommand
-                        {
-                            PathToDelete = item.Path
-                        };
-                        break;
-
-                    default:
-                        throw new InvalidOperationException("The type " + item.Type.ToString() + " is invalid");
-                }
-                commands.Add(command);
+                commands.Add(new DeleteFileCommand {
+                    PathToDelete = file.Path,
+                    LastModifiedDate = file.LastModified.Value
+                });
             }
 
-            // Generate the list of file and folder to upload
-            var itemsToUpload = localItems.Cast<IItem>().Except(remoteItems, _equalityComparer).ToArray();
-            foreach (var item in itemsToUpload)
+            // Generate the list of the folder to be deleted from remote
+            var remoteFolderItems = remoteItems.Where(item => item.Type == ItemType.Folder).ToArray();
+            var localFolderItems = localItems.Where(item => item.Type == ItemType.Folder).ToArray();
+            var foldersToDelete = remoteFolderItems.Except(localFolderItems, _equalityComparer).Cast<MegaNzItem>().ToArray();
+
+            // Delete the remote folder if needed
+            foreach(var folder in foldersToDelete)
             {
-                ICommand command;
+                commands.Add(new DeleteFolderCommand {
+                    PathToDelete = folder.Path
+                });
+            }
 
-                switch(item.Type)
+            // Generate the list of folder to create
+            var foldersToCreate = localFolderItems.Cast<IItem>().Except(remoteFolderItems, _equalityComparer).ToArray();
+            foreach (var folder in foldersToCreate)
+            {
+                commands.Add(new CreateFolderCommand
                 {
-                    case ItemType.File:
-                        command = new UploadFileCommand
-                        {
-                            SourcePath = LocalBasePath.TrimEnd('\\') + item.Path,
-                            DestinationPath = GetParentFolder(item),
-                            LastModifiedDate = item.LastModified.Value
-                        };
-                        break;
-
-                    case ItemType.Folder:
-                        command = new CreateFolderCommand
-                        {
-                            Name = item.Name,
-                            ParentPath = GetParentFolder(item)
-                        };
-                        break;
-
-                    default:
-                        throw new InvalidOperationException("The type " + item.Type.ToString() + " is invalid");
-                }
-                
-
-                commands.Add(command);
+                    Name = folder.Name,
+                    ParentPath = GetParentFolder(folder)
+                });
+            }
+            // Generate the list of file to upload
+            var filesToUpload = localFileItems.Cast<IItem>().Except(remoteFileItems, _equalityComparer).ToArray();
+            foreach (var file in filesToUpload)
+            {
+                commands.Add(new UploadFileCommand {
+                    SourcePath = LocalBasePath.TrimEnd('\\') + file.Path,
+                    DestinationPath = GetParentFolder(file),
+                    LastModifiedDate = file.LastModified.Value
+                });
             }
 
             return commands;

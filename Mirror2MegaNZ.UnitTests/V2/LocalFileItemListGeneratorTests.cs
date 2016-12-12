@@ -13,7 +13,7 @@ namespace Mirror2MegaNZ.UnitTests.V2
     public class LocalFileItemListGeneratorTests
     {
         [Test]
-        public void Generate_withABaseWithoutTheEndingSlash_shouldGenerateTheCorrectPath()
+        public void Generate_withABaseWithoutTheEndingSlash_shouldGenerateTheCorrectPathAndName()
         {
             // We want to check that the code add the needed slash at the end of the
             // base path
@@ -28,11 +28,13 @@ namespace Mirror2MegaNZ.UnitTests.V2
 
             var mockFolder2 = new Mock<IDirectoryInfo>(MockBehavior.Strict);
             mockFolder2.SetupGet(m => m.FullName).Returns(@"c:\folder1\folder2");
+            mockFolder2.SetupGet(m => m.Name).Returns("folder2");
             mockFolder2.Setup(m => m.GetDirectories()).Returns(new IDirectoryInfo[0]);
             mockFolder2.Setup(m => m.GetFiles()).Returns(new IFileInfo[0]);
 
             var mockFolder1 = new Mock<IDirectoryInfo>(MockBehavior.Strict);
             mockFolder1.SetupGet(m => m.FullName).Returns(@"c:\folder1");
+            mockFolder1.SetupGet(m => m.Name).Returns("folder1");
             mockFolder1.Setup(m => m.GetDirectories()).Returns(new[] { mockFolder2.Object });
             mockFolder1.Setup(m => m.GetFiles()).Returns(new IFileInfo[0]);
             
@@ -43,7 +45,9 @@ namespace Mirror2MegaNZ.UnitTests.V2
 
             // Assert
             result.Count.Should().Be(2);
+            result[0].Name.Should().Be(@"\");
             result[0].Path.Should().Be(@"\");
+            result[1].Name.Should().Be("folder");
             result[1].Path.Should().Be(@"\folder2");
         }
 
