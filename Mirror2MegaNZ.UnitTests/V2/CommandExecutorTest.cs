@@ -98,6 +98,7 @@ namespace Mirror2MegaNZ.UnitTests.V2
             const string rootMegaNzId = "0";
             var mockMegaNzNodeForRemoteRoot = new Mock<INode>(MockBehavior.Strict);
             mockMegaNzNodeForRemoteRoot.SetupGet(m => m.Id).Returns(rootMegaNzId);
+            mockMegaNzNodeForRemoteRoot.SetupGet(m => m.Type).Returns(NodeType.Root);
             var remoteItems = new List<MegaNzItem> {
                 new MegaNzItem(mockMegaNzNodeForRemoteRoot.Object, rootName, ItemType.Folder, rootPath, 0)
             };
@@ -107,7 +108,7 @@ namespace Mirror2MegaNZ.UnitTests.V2
             var uploadResultNode = new MegaNzNodeMock
             {
                 Id = newFileMegaNzId,
-                Name = filename,
+                Name = NameHandler.BuildRemoteFileName(filename, lastModifiedDate),
                 ParentId = rootMegaNzId,
                 Size = 1024,
                 Type = NodeType.File,
@@ -133,19 +134,99 @@ namespace Mirror2MegaNZ.UnitTests.V2
             executor.Execute(commandList, megaNzItemCollection, mockFileManager.Object, mockProgressNotifier.Object);
 
             // Assert
-            executor.MegaNzItems.Should().Contain(item => item.MegaNzNode.Id == newFileMegaNzId);
+            megaNzItemCollection.GetList().Should().Contain(item => item.MegaNzNode.Id == newFileMegaNzId);
         }
 
         [Test]
         public void Execute_withADeleteCommand_shouldMakeTheCorrectCallToTheMegaNzClient()
         {
-            throw new NotImplementedException();
+            // Arrange
+            var deleteCommand = new DeleteFileCommand
+            {
+                PathToDelete = "\\folder1\\file1.jpeg",
+                LastModifiedDate = new DateTime(2016, 1, 1, 0, 0, 0)
+            };
+            var commandList = new[] { deleteCommand };
+
+            // Remote items
+            // Root in the remote file structure
+            var mockMegaNzNodeForRemoteRoot = new Mock<INode>(MockBehavior.Strict);
+            var megaNzItemRemoteRoot = new MegaNzItem(mockMegaNzNodeForRemoteRoot.Object, "\\", ItemType.Folder, "\\", 0);
+
+            // Folder1 in the remote file structure
+            var mockMegaNzNodeForRemoteFolder1 = new Mock<INode>(MockBehavior.Strict);
+            var megaNzItemForRemoteFolder1 = new MegaNzItem(mockMegaNzNodeForRemoteFolder1.Object, "\\folder1", ItemType.Folder, "\\folder1", 0);
+
+            // File1.jpeg in the remote file structure
+            var mockMegaNzNodeForRemoteFile1 = new Mock<INode>(MockBehavior.Strict);
+            var megaNzItemForRemoteFile1 = new MegaNzItem(mockMegaNzNodeForRemoteFile1.Object, "\\folder1\\file1.jpeg", ItemType.File, "\\folder1\\file1.jpeg", 0);
+
+            var remoteItems = new[] {
+                megaNzItemRemoteRoot,
+                megaNzItemForRemoteFolder1,
+                megaNzItemForRemoteFile1
+            };
+            var megaNzItemCollection = new MegaNzItemCollection(remoteItems);
+
+            var mockMegaApiClient = new Mock<IMegaApiClient>(MockBehavior.Strict);
+            mockMegaApiClient.Setup(m => m.Delete(mockMegaNzNodeForRemoteFile1.Object, true)).Verifiable();
+
+            var mockFileManager = new Mock<IFileManager>(MockBehavior.Strict);
+
+            var mockProgressNotifier = new Mock<IProgress<double>>(MockBehavior.Strict);
+
+            // Act
+            var commandExecutor = new CommandExecutor(mockMegaApiClient.Object);
+            commandExecutor.Execute(commandList, megaNzItemCollection, mockFileManager.Object, mockProgressNotifier.Object);
+
+            mockMegaApiClient.VerifyAll();
         }
 
         [Test]
-        public void Execute_withADeleteCommand_shouldUploadTheMegaNzItemCollection()
+        public void Execute_withADeleteCommand_shouldRemoveTheDeletedItemFromTheMegaNzItemCollection()
         {
-            throw new NotImplementedException();
+            // Arrange
+            var deleteCommand = new DeleteFileCommand
+            {
+                PathToDelete = "\\folder1\\file1.jpeg",
+                LastModifiedDate = new DateTime(2016, 1, 1, 0, 0, 0)
+            };
+            var commandList = new[] { deleteCommand };
+
+            // Remote items
+            // Root in the remote file structure
+            var mockMegaNzNodeForRemoteRoot = new Mock<INode>(MockBehavior.Strict);
+            var megaNzItemRemoteRoot = new MegaNzItem(mockMegaNzNodeForRemoteRoot.Object, "\\", ItemType.Folder, "\\", 0);
+
+            // Folder1 in the remote file structure
+            var mockMegaNzNodeForRemoteFolder1 = new Mock<INode>(MockBehavior.Strict);
+            var megaNzItemForRemoteFolder1 = new MegaNzItem(mockMegaNzNodeForRemoteFolder1.Object, "\\folder1", ItemType.Folder, "\\folder1", 0);
+
+            // File1.jpeg in the remote file structure
+            var mockMegaNzNodeForRemoteFile1 = new Mock<INode>(MockBehavior.Strict);
+            var megaNzItemForRemoteFile1 = new MegaNzItem(mockMegaNzNodeForRemoteFile1.Object, "\\folder1\\file1.jpeg", ItemType.File, "\\folder1\\file1.jpeg", 0);
+
+            var remoteItems = new[] {
+                megaNzItemRemoteRoot,
+                megaNzItemForRemoteFolder1,
+                megaNzItemForRemoteFile1
+            };
+            var megaNzItemCollection = new MegaNzItemCollection(remoteItems);
+
+            var mockMegaApiClient = new Mock<IMegaApiClient>(MockBehavior.Strict);
+            mockMegaApiClient.Setup(m => m.Delete(mockMegaNzNodeForRemoteFile1.Object, true)).Verifiable();
+
+            var mockFileManager = new Mock<IFileManager>(MockBehavior.Strict);
+
+            var mockProgressNotifier = new Mock<IProgress<double>>(MockBehavior.Strict);
+
+            // Act
+            var commandExecutor = new CommandExecutor(mockMegaApiClient.Object);
+            commandExecutor.Execute(commandList, megaNzItemCollection, mockFileManager.Object, mockProgressNotifier.Object);
+
+            // Assert
+            Action action = () => megaNzItemCollection.GetByPath("\\folder1\\file1.jpeg");
+            action.ShouldThrow<KeyNotFoundException>("the key is not in the dictionary");
         }
 
         [Test]

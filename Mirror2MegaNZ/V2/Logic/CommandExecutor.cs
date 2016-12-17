@@ -22,10 +22,8 @@ namespace Mirror2MegaNZ.V2.Logic
             _megaApiClient = megaApiClient;
         }
           
-        public List<MegaNzItem> MegaNzItems { get; private set; }
-    
         public void Execute(IEnumerable<ICommand> commands, 
-            IMegaNzItemCollection megaNzItemCollection, 
+            IMegaNzItemCollection megaNzItemCollection,
             IFileManager fileManager,
             IProgress<double> progressNotifier)
         {

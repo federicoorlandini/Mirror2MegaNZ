@@ -30,7 +30,7 @@ namespace Mirror2MegaNZ.V2.DomainModel
             LastModified = lastModified;
         }
 
-        public MegaNzItem(INode megaNzNode, Dictionary<string, INode> megaNzNodeCollection)
+        public MegaNzItem(INode megaNzNode, Dictionary<string, INode> megaNzNodeDictionary)
         {
             MegaNzNode = megaNzNode;
 
@@ -46,13 +46,13 @@ namespace Mirror2MegaNZ.V2.DomainModel
                 case NodeType.Directory:
                     Name = megaNzNode.Name;
                     Type = ItemType.Folder;
-                    Path = BuildPath(megaNzNode, megaNzNodeCollection);
+                    Path = BuildPath(megaNzNode, megaNzNodeDictionary);
                     Size = 0;
                     break;
 
                 case NodeType.File:
                     Type = ItemType.File;
-                    Path = BuildPath(megaNzNode, megaNzNodeCollection);
+                    Path = BuildPath(megaNzNode, megaNzNodeDictionary);
                     Size = megaNzNode.Size;
 
                     // Extract the filename, removing the last modification date
@@ -68,7 +68,7 @@ namespace Mirror2MegaNZ.V2.DomainModel
             }
         }
 
-        private string BuildPath(INode megaNzNode, Dictionary<string, INode> megaNzNodeCollection)
+        private string BuildPath(INode megaNzNode, Dictionary<string, INode> megaNzNodeDictionary)
         {
             if (megaNzNode.Type == NodeType.Root)
             {
@@ -77,8 +77,8 @@ namespace Mirror2MegaNZ.V2.DomainModel
 
             if (megaNzNode.Type != NodeType.File)
             {
-                var parentNode = megaNzNodeCollection[megaNzNode.ParentId];
-                var path = BuildPath(parentNode, megaNzNodeCollection) + megaNzNode.Name
+                var parentNode = megaNzNodeDictionary[megaNzNode.ParentId];
+                var path = BuildPath(parentNode, megaNzNodeDictionary) + megaNzNode.Name
 ;
                 // we need to add a slash at the end to correctly build the path
                 return path + @"\";
@@ -90,8 +90,8 @@ namespace Mirror2MegaNZ.V2.DomainModel
                 DateTime datetime;
                 NameHandler.ExtractFilenameAndDateTimeFromRemoteFilename(megaNzNode.Name, out filename, out datetime);
 
-                var parentNode = megaNzNodeCollection[megaNzNode.ParentId];
-                var path = BuildPath(parentNode, megaNzNodeCollection) + filename;
+                var parentNode = megaNzNodeDictionary[megaNzNode.ParentId];
+                var path = BuildPath(parentNode, megaNzNodeDictionary) + filename;
 
                 return path;
             }
