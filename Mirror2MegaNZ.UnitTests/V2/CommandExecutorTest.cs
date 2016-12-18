@@ -38,6 +38,7 @@ namespace Mirror2MegaNZ.UnitTests.V2
             const string rootMegaNzId = "0";
             var mockMegaNzNodeForRemoteRoot = new Mock<INode>(MockBehavior.Strict);
             mockMegaNzNodeForRemoteRoot.SetupGet(m => m.Id).Returns(rootMegaNzId);
+            mockMegaNzNodeForRemoteRoot.SetupGet(m => m.Type).Returns(NodeType.Root);
             var remoteItems = new List<MegaNzItem> {
                 new MegaNzItem(mockMegaNzNodeForRemoteRoot.Object, rootName, ItemType.Folder, rootPath, 0)
             };
@@ -56,7 +57,7 @@ namespace Mirror2MegaNZ.UnitTests.V2
                                                   mockProgressNotifier.Object))
                              .ReturnsAsync(new MegaNzNodeMock {
                                  Id = newFileMegaNzId,
-                                 Name = filename,
+                                 Name = uploadedFileName,
                                  ParentId = rootMegaNzId,
                                  Size = 1024,
                                  Type = NodeType.File,
@@ -232,13 +233,142 @@ namespace Mirror2MegaNZ.UnitTests.V2
         [Test]
         public void Execute_withACreateFolderCommand_shouldMakeTheCorrectCallToTheMegaNzClient()
         {
-            throw new NotImplementedException();
+            // Scenario
+            // Local file structure
+            // root
+            //    |
+            //    +--> folder1
+            //               |
+            //               +--> folder2
+            //
+            // Remote file structure
+            // root
+            //    |
+            //    +--> folder1
+            
+            // Arrange
+            var createFolderCommand = new CreateFolderCommand {
+                ParentPath = "\\folder1",
+                Name = "folder2"
+            };
+            var commandList = new[] { createFolderCommand };
+
+            // Remote items
+            // Root in the remote file structure
+            var mockMegaNzNodeForRemoteRoot = new Mock<INode>(MockBehavior.Strict);
+            mockMegaNzNodeForRemoteRoot.SetupGet(m => m.Id).Returns("0");
+            mockMegaNzNodeForRemoteRoot.SetupGet(m => m.Name).Returns("\\");
+            mockMegaNzNodeForRemoteRoot.SetupGet(m => m.Type).Returns(NodeType.Root);
+            var megaNzItemRemoteRoot = new MegaNzItem(mockMegaNzNodeForRemoteRoot.Object, "\\", ItemType.Folder, "\\", 0);
+
+            // Folder1 in the remote file structure
+            var mockMegaNzNodeForRemoteFolder1 = new Mock<INode>(MockBehavior.Strict);
+            mockMegaNzNodeForRemoteFolder1.SetupGet(m => m.Id).Returns("1");
+            mockMegaNzNodeForRemoteFolder1.SetupGet(m => m.Name).Returns("folder1");
+            mockMegaNzNodeForRemoteFolder1.SetupGet(m => m.Type).Returns(NodeType.Directory);
+            mockMegaNzNodeForRemoteFolder1.SetupGet(m => m.ParentId).Returns("0");
+            var megaNzItemForRemoteFolder1 = new MegaNzItem(mockMegaNzNodeForRemoteFolder1.Object, "\\folder1", ItemType.Folder, "\\folder1", 0);
+
+            var remoteItems = new[] {
+                megaNzItemRemoteRoot,
+                megaNzItemForRemoteFolder1
+            };
+            var megaNzItemCollection = new MegaNzItemCollection(remoteItems);
+
+            // The MegaNzNode for the folder created
+            var mockMegaNzNodeForRemoteFolder2 = new Mock<INode>(MockBehavior.Strict);
+            mockMegaNzNodeForRemoteFolder2.SetupGet(m => m.Id).Returns("2");
+            mockMegaNzNodeForRemoteFolder2.SetupGet(m => m.Name).Returns("folder2");
+            mockMegaNzNodeForRemoteFolder2.SetupGet(m => m.Type).Returns(NodeType.Directory);
+            mockMegaNzNodeForRemoteFolder2.SetupGet(m => m.ParentId).Returns("1");
+
+            var mockMegaApiClient = new Mock<IMegaApiClient>(MockBehavior.Strict);
+            mockMegaApiClient
+                .Setup(m => m.CreateFolder(createFolderCommand.Name, mockMegaNzNodeForRemoteFolder1.Object))
+                .Returns(mockMegaNzNodeForRemoteFolder2.Object);
+
+            var mockFileManager = new Mock<IFileManager>(MockBehavior.Strict);
+
+            var mockProgressNotifier = new Mock<IProgress<double>>(MockBehavior.Strict);
+
+            // Act
+            var commandExecutor = new CommandExecutor(mockMegaApiClient.Object);
+            commandExecutor.Execute(commandList, megaNzItemCollection, mockFileManager.Object, mockProgressNotifier.Object);
+
+            // Assert
+            mockMegaApiClient.VerifyAll();
         }
 
         [Test]
         public void Execute_withACreateFolderCommand_shouldUploadTheMegaNzItemCollection()
         {
-            throw new NotImplementedException();
+            // Scenario
+            // Local file structure
+            // root
+            //    |
+            //    +--> folder1
+            //               |
+            //               +--> folder2
+            //
+            // Remote file structure
+            // root
+            //    |
+            //    +--> folder1
+
+            // Arrange
+            var createFolderCommand = new CreateFolderCommand
+            {
+                ParentPath = "\\folder1",
+                Name = "folder2"
+            };
+            var commandList = new[] { createFolderCommand };
+
+            // Remote items
+            // Root in the remote file structure
+            var mockMegaNzNodeForRemoteRoot = new Mock<INode>(MockBehavior.Strict);
+            mockMegaNzNodeForRemoteRoot.SetupGet(m => m.Id).Returns("0");
+            mockMegaNzNodeForRemoteRoot.SetupGet(m => m.Type).Returns(NodeType.Root);
+            mockMegaNzNodeForRemoteRoot.SetupGet(m => m.Name).Returns("\\");
+            var megaNzItemRemoteRoot = new MegaNzItem(mockMegaNzNodeForRemoteRoot.Object, "\\", ItemType.Folder, "\\", 0);
+
+            // Folder1 in the remote file structure
+            var mockMegaNzNodeForRemoteFolder1 = new Mock<INode>(MockBehavior.Strict);
+            mockMegaNzNodeForRemoteFolder1.SetupGet(m => m.Id).Returns("1");
+            mockMegaNzNodeForRemoteFolder1.SetupGet(m => m.ParentId).Returns("0");
+            mockMegaNzNodeForRemoteFolder1.SetupGet(m => m.Type).Returns(NodeType.Directory);
+            mockMegaNzNodeForRemoteFolder1.SetupGet(m => m.Name).Returns("folder1");
+            var megaNzItemForRemoteFolder1 = new MegaNzItem(mockMegaNzNodeForRemoteFolder1.Object, "\\folder1", ItemType.Folder, "\\folder1", 0);
+
+            var remoteItems = new[] {
+                megaNzItemRemoteRoot,
+                megaNzItemForRemoteFolder1
+            };
+            var megaNzItemCollection = new MegaNzItemCollection(remoteItems);
+
+            // The MegaNzNode for the folder created
+            var mockMegaNzNodeForRemoteFolder2 = new MegaNzNodeMock {
+                Id = "2",
+                Name = "folder2",
+                Type = NodeType.Directory,
+                Size = 0,
+                ParentId = "1"
+            };
+
+            var mockMegaApiClient = new Mock<IMegaApiClient>(MockBehavior.Strict);
+            mockMegaApiClient
+                .Setup(m => m.CreateFolder(createFolderCommand.Name, mockMegaNzNodeForRemoteFolder1.Object))
+                .Returns(mockMegaNzNodeForRemoteFolder2);
+
+            var mockFileManager = new Mock<IFileManager>(MockBehavior.Strict);
+
+            var mockProgressNotifier = new Mock<IProgress<double>>(MockBehavior.Strict);
+
+            // Act
+            var commandExecutor = new CommandExecutor(mockMegaApiClient.Object);
+            commandExecutor.Execute(commandList, megaNzItemCollection, mockFileManager.Object, mockProgressNotifier.Object);
+
+            // Assert
+            megaNzItemCollection.GetList().Should().Contain(item => item.MegaNzNode.Id == mockMegaNzNodeForRemoteFolder2.Id);
         }
 
         [Test]

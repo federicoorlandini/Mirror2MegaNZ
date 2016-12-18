@@ -2,7 +2,6 @@
 using Mirror2MegaNZ.Logic;
 using Mirror2MegaNZ.V2.Logic;
 using System;
-using System.Collections.Generic;
 
 namespace Mirror2MegaNZ.V2.DomainModel.Commands
 {
@@ -16,7 +15,14 @@ namespace Mirror2MegaNZ.V2.DomainModel.Commands
             IFileManager fileManager,
             IProgress<double> progressNotifier)
         {
-            throw new NotImplementedException();
+            // Find the MegaNZ node related to the parent folder
+            var parent = megaNzItemCollection.GetByPath(ParentPath);
+
+            // Create the new folder
+            var newNode = megaApiClient.CreateFolder(Name, parent);
+
+            // Update the item collection
+            megaNzItemCollection.Add(newNode);
         }
 
         public override string ToString()

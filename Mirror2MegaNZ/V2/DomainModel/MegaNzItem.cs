@@ -78,8 +78,7 @@ namespace Mirror2MegaNZ.V2.DomainModel
             if (megaNzNode.Type != NodeType.File)
             {
                 var parentNode = megaNzNodeDictionary[megaNzNode.ParentId];
-                var path = BuildPath(parentNode, megaNzNodeDictionary) + megaNzNode.Name
-;
+                var path = BuildPath(parentNode, megaNzNodeDictionary) + megaNzNode.Name;
                 // we need to add a slash at the end to correctly build the path
                 return path + @"\";
             }
