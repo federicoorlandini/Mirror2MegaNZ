@@ -41,13 +41,13 @@ namespace Mirror2MegaNZ.UnitTests.V2
         public void Constructor_usingDirectoryInfo_shouldBuildTheCorrectPath()
         {
             var mockDirectoryInfo = new Mock<IDirectoryInfo>();
-            mockDirectoryInfo.SetupGet(m => m.FullName).Returns(@"c:\folder1\folder2\folder3\");
+            mockDirectoryInfo.SetupGet(m => m.FullName).Returns(@"c:\folder1\folder2\folder3");
             var baseFolder = @"c:\folder1\";
 
             var item = new FileItem(mockDirectoryInfo.Object, baseFolder);
 
-            item.Path.Should().Be(@"\folder2\folder3\");
-            item.Name.Should().Be(string.Empty);    // This is needed to be able to compare with the MegaNzItems
+            item.Path.Should().Be(@"\folder2\folder3");
+            item.Name.Should().Be("folder3");
         }
     }
 }

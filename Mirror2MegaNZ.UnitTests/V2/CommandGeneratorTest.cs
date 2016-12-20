@@ -563,7 +563,7 @@ namespace Mirror2MegaNZ.UnitTests.V2
             commandList[0].Should().BeOfType<UploadFileCommand>();
             var uploadCommand = (UploadFileCommand)commandList[0];
             uploadCommand.SourcePath.Should().Be(@"c:\testing\Folder1\File1.jpeg");
-            uploadCommand.DestinationPath.Should().Be(@"\Folder1\");
+            uploadCommand.DestinationPath.Should().Be(@"\Folder1");
             uploadCommand.LastModifiedDate.Should().Be(lastModifiedDate);
 
             mockMegaNzNodeForRemoteRoot.VerifyAll();
@@ -769,7 +769,7 @@ namespace Mirror2MegaNZ.UnitTests.V2
             commandList[1].Should().BeOfType<UploadFileCommand>();
             var uploadCommand = (UploadFileCommand)commandList[1];
             uploadCommand.SourcePath.Should().Be(@"c:\testing\Folder1\File1.jpeg");
-            uploadCommand.DestinationPath.Should().Be(@"\Folder1\");
+            uploadCommand.DestinationPath.Should().Be(@"\Folder1");
             uploadCommand.LastModifiedDate.Should().Be(lastModifiedDate);
 
             mockMegaNzNodeForRemoteRoot.VerifyAll();
@@ -848,7 +848,7 @@ namespace Mirror2MegaNZ.UnitTests.V2
             commandList[1].Should().BeOfType<UploadFileCommand>();
             var uploadCommand = (UploadFileCommand)commandList[1];
             uploadCommand.SourcePath.Should().Be(@"c:\testing\Folder1\File1.jpeg");
-            uploadCommand.DestinationPath.Should().Be(@"\Folder1\");
+            uploadCommand.DestinationPath.Should().Be(@"\Folder1");
             uploadCommand.LastModifiedDate.Should().Be(localLastModifiedDate);
 
             mockMegaNzNodeForRemoteRoot.VerifyAll();
@@ -927,7 +927,7 @@ namespace Mirror2MegaNZ.UnitTests.V2
             commandList[1].Should().BeOfType<UploadFileCommand>();
             var uploadFileCommand = (UploadFileCommand)commandList[1];
             uploadFileCommand.SourcePath.Should().Be(localBasePath + folderName + @"\" + fileName);
-            uploadFileCommand.DestinationPath.Should().Be(@"\" + folderName + @"\");
+            uploadFileCommand.DestinationPath.Should().Be(@"\" + folderName);
             uploadFileCommand.LastModifiedDate.Should().Be(localLastModifiedDate);
 
             mockMegaNzNodeForRemoteRoot.VerifyAll();

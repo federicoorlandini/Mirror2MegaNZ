@@ -72,15 +72,14 @@ namespace Mirror2MegaNZ.V2.DomainModel
         {
             if (megaNzNode.Type == NodeType.Root)
             {
-                return @"\";
+                return string.Empty;
             }
 
             if (megaNzNode.Type != NodeType.File)
             {
                 var parentNode = megaNzNodeDictionary[megaNzNode.ParentId];
-                var path = BuildPath(parentNode, megaNzNodeDictionary) + megaNzNode.Name;
-                // we need to add a slash at the end to correctly build the path
-                return path + @"\";
+                var path = BuildPath(parentNode, megaNzNodeDictionary) + @"\" + megaNzNode.Name;
+                return path;
             }
             else
             {
@@ -90,7 +89,7 @@ namespace Mirror2MegaNZ.V2.DomainModel
                 NameHandler.ExtractFilenameAndDateTimeFromRemoteFilename(megaNzNode.Name, out filename, out datetime);
 
                 var parentNode = megaNzNodeDictionary[megaNzNode.ParentId];
-                var path = BuildPath(parentNode, megaNzNodeDictionary) + filename;
+                var path = BuildPath(parentNode, megaNzNodeDictionary) + @"\" + filename;
 
                 return path;
             }

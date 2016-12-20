@@ -1,12 +1,7 @@
-﻿using CG.Web.MegaApiClient;
-using Mirror2MegaNZ.DomainModel;
-using Mirror2MegaNZ.V2.DomainModel;
+﻿using Mirror2MegaNZ.V2.DomainModel;
 using Mirror2MegaNZ.V2.DomainModel.Commands;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Mirror2MegaNZ.V2.Logic
 {
@@ -88,7 +83,7 @@ namespace Mirror2MegaNZ.V2.Logic
         /// <returns></returns>
         private string GetParentFolder(IItem item)
         {
-            var path = item.Path.TrimEnd(new[] { '\\' });
+            var path = item.Path.TrimEnd('\\');
 
             if( path.Length == 0 )
             {
@@ -97,7 +92,10 @@ namespace Mirror2MegaNZ.V2.Logic
             }
 
             var lastIndexSlash = path.LastIndexOf('\\');
-            return path.Substring(0, lastIndexSlash + 1);
+            var result = path.Substring(0, lastIndexSlash);
+
+            // If the result is empty then we need to return the Root path
+            return string.IsNullOrEmpty(result) ? "\\" : result;
         }
     }
 }

@@ -2,7 +2,6 @@
 using Mirror2MegaNZ.Logic;
 using Mirror2MegaNZ.V2.Logic;
 using System;
-using System.Collections.Generic;
 
 namespace Mirror2MegaNZ.V2.DomainModel.Commands
 {
@@ -15,7 +14,9 @@ namespace Mirror2MegaNZ.V2.DomainModel.Commands
             IFileManager fileManager,
             IProgress<double> progressNotifier)
         {
-            throw new NotImplementedException();
+            var nodeToDelete = megaNzItemCollection.GetByPath(PathToDelete);
+            megaApiClient.Delete(nodeToDelete);
+            megaNzItemCollection.RemoveItemByExactPath(PathToDelete);
         }
 
         public override string ToString()

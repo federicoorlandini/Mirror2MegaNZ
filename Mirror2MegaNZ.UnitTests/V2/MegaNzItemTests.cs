@@ -129,7 +129,7 @@ namespace Mirror2MegaNZ.UnitTests.V2
             var folder3Item = new MegaNzItem(folder3, nodeDictionary);
 
             // Assert
-            folder3Item.Path.Should().Be(@"\folder1\folder2\folder3\");
+            folder3Item.Path.Should().Be(@"\folder1\folder2\folder3");
         }
 
         [Test]

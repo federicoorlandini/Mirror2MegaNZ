@@ -3,6 +3,7 @@ using FluentAssertions;
 using Mirror2MegaNZ.V2.DomainModel;
 using Mirror2MegaNZ.V2.Logic;
 using NUnit.Framework;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -81,7 +82,7 @@ namespace Mirror2MegaNZ.UnitTests.V2
             result[0].Type.Should().Be(ItemType.Folder);
 
             result[1].Name.Should().Be("Folder1");
-            result[1].Path.Should().Be(@"\Folder1\");
+            result[1].Path.Should().Be(@"\Folder1");
             result[1].Type.Should().Be(ItemType.Folder);
 
             result[2].Name.Should().Be("File1.jpeg");
@@ -105,6 +106,178 @@ namespace Mirror2MegaNZ.UnitTests.V2
             result[3].LastModified.Value.Minute.Should().Be(1);
             result[3].LastModified.Value.Second.Should().Be(1);
             result[3].Type.Should().Be(ItemType.File);
+        }
+
+        [Test]
+        public void Generate_shouldFilterOutTheTrashFolder()
+        {
+            var root = new MegaNzNodeMock
+            {
+                Id = "1",
+                Name = @"\",
+                ParentId = string.Empty,
+                Type = NodeType.Root
+            };
+
+            var trashFolder = new MegaNzNodeMock
+            {
+                Id = "2",
+                Name = null,
+                ParentId = string.Empty,
+                Type = NodeType.Trash
+            };
+
+            var megaNzCollection = new List<INode> {
+                root,
+                trashFolder
+            };
+
+            // Act
+            var generator = new MegaNzItemListGenerator();
+            MegaNzItem[] result = generator.Generate(megaNzCollection).ToArray();
+
+            // Assert
+            result.Length.Should().Be(1);
+            result[0].MegaNzNode.Type.Should().Be(NodeType.Root);
+        }
+
+        [Test]
+        public void Generate_shouldFilterOutTheInboxFolder()
+        {
+            var root = new MegaNzNodeMock
+            {
+                Id = "1",
+                Name = @"\",
+                ParentId = string.Empty,
+                Type = NodeType.Root
+            };
+
+            var inboxFolder = new MegaNzNodeMock
+            {
+                Id = "2",
+                Name = null,
+                ParentId = string.Empty,
+                Type = NodeType.Inbox
+            };
+
+            var megaNzCollection = new List<INode> {
+                root,
+                inboxFolder
+            };
+
+            // Act
+            var generator = new MegaNzItemListGenerator();
+            MegaNzItem[] result = generator.Generate(megaNzCollection).ToArray();
+
+            // Assert
+            result.Length.Should().Be(1);
+            result[0].MegaNzNode.Type.Should().Be(NodeType.Root);
+        }
+
+        [Test]
+        public void Generate_shouldFilterOutTheTrashFolderHierarchyNodes()
+        {
+            var root = new MegaNzNodeMock
+            {
+                Id = "1",
+                Name = @"\",
+                ParentId = string.Empty,
+                Type = NodeType.Root
+            };
+
+            var trashFolder = new MegaNzNodeMock
+            {
+                Id = "2",
+                Name = null,
+                ParentId = string.Empty,
+                Type = NodeType.Trash
+            };
+
+            var folderChildOfTrash = new MegaNzNodeMock
+            {
+                Id = "3",
+                Name = "folder1",
+                ParentId = trashFolder.Id,
+                Type = NodeType.Directory
+            };
+
+            var fileChildOfTrash = new MegaNzNodeMock
+            {
+                Id = "4",
+                Name = "file1",
+                ParentId = folderChildOfTrash.Id,
+                Type = NodeType.File,
+                Size = 1024,
+                LastModificationDate = new DateTime(2016, 1, 1, 0, 0, 0)
+            };
+
+            var megaNzCollection = new List<INode> {
+                root,
+                trashFolder,
+                folderChildOfTrash,
+                fileChildOfTrash
+            };
+
+            // Act
+            var generator = new MegaNzItemListGenerator();
+            MegaNzItem[] result = generator.Generate(megaNzCollection).ToArray();
+
+            // Assert
+            result.Length.Should().Be(1);
+            result[0].MegaNzNode.Type.Should().Be(NodeType.Root);
+        }
+
+        [Test]
+        public void Generate_shouldFilterOutTheInboxFolderHierarchyNodes()
+        {
+            var root = new MegaNzNodeMock
+            {
+                Id = "1",
+                Name = @"\",
+                ParentId = string.Empty,
+                Type = NodeType.Root
+            };
+
+            var inboxFolder = new MegaNzNodeMock
+            {
+                Id = "2",
+                Name = null,
+                ParentId = string.Empty,
+                Type = NodeType.Trash
+            };
+
+            var folderChildOfInbox = new MegaNzNodeMock
+            {
+                Id = "3",
+                Name = "folder1",
+                ParentId = inboxFolder.Id,
+                Type = NodeType.Directory
+            };
+
+            var fileChildOfInbox = new MegaNzNodeMock
+            {
+                Id = "4",
+                Name = "file1",
+                ParentId = folderChildOfInbox.Id,
+                Type = NodeType.File,
+                Size = 1024,
+                LastModificationDate = new DateTime(2016, 1, 1, 0, 0, 0)
+            };
+
+            var megaNzCollection = new List<INode> {
+                root,
+                inboxFolder,
+                folderChildOfInbox,
+                fileChildOfInbox
+            };
+
+            // Act
+            var generator = new MegaNzItemListGenerator();
+            MegaNzItem[] result = generator.Generate(megaNzCollection).ToArray();
+
+            // Assert
+            result.Length.Should().Be(1);
+            result[0].MegaNzNode.Type.Should().Be(NodeType.Root);
         }
     }
 }
