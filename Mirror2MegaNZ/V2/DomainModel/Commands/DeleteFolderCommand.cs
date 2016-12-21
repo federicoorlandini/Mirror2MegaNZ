@@ -21,7 +21,7 @@ namespace Mirror2MegaNZ.V2.DomainModel.Commands
 
         public override string ToString()
         {
-            return $"Delte File Command - PathToDelete: {PathToDelete}";
+            return $"Delete File Command - PathToDelete: {PathToDelete}";
         }
     }
 }

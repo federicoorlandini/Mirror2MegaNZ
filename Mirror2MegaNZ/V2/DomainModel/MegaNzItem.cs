@@ -46,7 +46,7 @@ namespace Mirror2MegaNZ.V2.DomainModel
                 case NodeType.Directory:
                     Name = megaNzNode.Name;
                     Type = ItemType.Folder;
-                    Path = BuildPath(megaNzNode, megaNzNodeDictionary);
+                    Path = BuildPath(megaNzNode, megaNzNodeDictionary) + @"\";
                     Size = 0;
                     break;
 

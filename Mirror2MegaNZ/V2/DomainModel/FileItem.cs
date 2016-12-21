@@ -18,8 +18,15 @@ namespace Mirror2MegaNZ.V2.DomainModel
                 {
                     return @"\";
                 }
-                return System.IO.Path.GetFileName(Path);
+                return GetNameFromPath(Path);
             }
+        }
+
+        private string GetNameFromPath(string path)
+        {
+            path = path.TrimEnd('\\');
+            var lastBackSlashIndex = path.LastIndexOf('\\');
+            return path.Substring(lastBackSlashIndex + 1);
         }
 
         public FileItem(ItemType type, string path, long size, DateTime? lastModified = null)
@@ -39,8 +46,7 @@ namespace Mirror2MegaNZ.V2.DomainModel
 
             Type = ItemType.File;
 
-            baseFolderPath = baseFolderPath.TrimEnd(new[] { '\\' });
-            Path = BuildRelativePath(file.FullName, baseFolderPath);
+            Path = BuildRelativePath(file.FullName, baseFolderPath); // The file must NOT HAVE a final backslash
             Size = file.Length;
             LastModified = new DateTime(file.LastWriteTimeUtc.Year,
                 file.LastWriteTimeUtc.Month,
@@ -58,8 +64,7 @@ namespace Mirror2MegaNZ.V2.DomainModel
             }
             
             Type = ItemType.Folder;
-            baseFolderPath = baseFolderPath.TrimEnd(new[] { '\\' });
-            Path = BuildRelativePath(folder.FullName, baseFolderPath);
+            Path = BuildRelativePath(folder.FullName, baseFolderPath) + "\\";    // The folder must have a final backslash
             Size = 0;
         }
 
@@ -77,8 +82,10 @@ namespace Mirror2MegaNZ.V2.DomainModel
 
         private string BuildRelativePath(string absolutePath, string basePath)
         {
+            basePath = basePath.TrimEnd('\\');
+            absolutePath = absolutePath.TrimEnd('\\');
             var relativePath = absolutePath.Substring(basePath.Length);
-            return string.IsNullOrEmpty(relativePath) ? @"\" : relativePath;
+            return relativePath;
         }
     }
 }

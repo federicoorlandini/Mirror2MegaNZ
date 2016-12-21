@@ -48,7 +48,7 @@ namespace Mirror2MegaNZ.UnitTests.V2
             result[0].Name.Should().Be(@"\");
             result[0].Path.Should().Be(@"\");
             result[1].Name.Should().Be("folder2");
-            result[1].Path.Should().Be(@"\folder2");
+            result[1].Path.Should().Be(@"\folder2\");   // The path for a folder must end with a backslash
         }
 
         [Test]
@@ -122,11 +122,11 @@ namespace Mirror2MegaNZ.UnitTests.V2
             // Assert
             result.Count.Should().Be(7);
             result[0].Path.Should().Be(@"\");
-            result[1].Path.Should().Be(@"\folder1A");
-            result[2].Path.Should().Be(@"\folder1A\folder2A");
+            result[1].Path.Should().Be(@"\folder1A\");  // Forlder's path MUST end with a backslash
+            result[2].Path.Should().Be(@"\folder1A\folder2A\");  // Forlder's path MUST end with a backslash
             result[3].Path.Should().Be(@"\folder1A\folder2A\file2A.jpeg");
             result[3].LastModified.Should().Be(file2ALastModifiedDate);
-            result[4].Path.Should().Be(@"\folder1B");
+            result[4].Path.Should().Be(@"\folder1B\");  // Forlder's path MUST end with a backslash
             result[5].Path.Should().Be(@"\folder1B\file2B.jpeg");
             result[5].LastModified.Should().Be(file2BLastModifiedDate);
             result[6].Path.Should().Be(@"\folder1B\file3B.jpeg");
@@ -179,10 +179,10 @@ namespace Mirror2MegaNZ.UnitTests.V2
             // Assert
             result.Count.Should().Be(4);
             result[0].Path.Should().Be(@"\");
-            result[1].Path.Should().Be(@"\folder0");
+            result[1].Path.Should().Be(@"\folder0\");   // A folder must have a final backslash in the path
             result[2].Path.Should().Be(@"\folder0\file1A.jpeg");
             result[2].LastModified.Should().Be(file1LastModified);
-            result[3].Path.Should().Be(@"\folder0\folder1A");
+            result[3].Path.Should().Be(@"\folder0\folder1A\");   // A folder must have a final backslash in the path
         }
     }
 }

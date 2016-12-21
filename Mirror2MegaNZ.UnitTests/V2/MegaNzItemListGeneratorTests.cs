@@ -82,7 +82,7 @@ namespace Mirror2MegaNZ.UnitTests.V2
             result[0].Type.Should().Be(ItemType.Folder);
 
             result[1].Name.Should().Be("Folder1");
-            result[1].Path.Should().Be(@"\Folder1");
+            result[1].Path.Should().Be(@"\Folder1\");  // Forlder's path MUST end with a backslash
             result[1].Type.Should().Be(ItemType.Folder);
 
             result[2].Name.Should().Be("File1.jpeg");

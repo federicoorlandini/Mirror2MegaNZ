@@ -46,7 +46,7 @@ namespace Mirror2MegaNZ.UnitTests.V2
 
             var item = new FileItem(mockDirectoryInfo.Object, baseFolder);
 
-            item.Path.Should().Be(@"\folder2\folder3");
+            item.Path.Should().Be(@"\folder2\folder3\");    // We want to have the backslash at the end of the path for the directory item
             item.Name.Should().Be("folder3");
         }
     }

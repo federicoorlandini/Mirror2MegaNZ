@@ -81,7 +81,7 @@ namespace Mirror2MegaNZ.V2.Logic
         /// </summary>
         /// <param name="item">The item.</param>
         /// <returns></returns>
-        private string GetParentFolder(IItem item)
+        internal string GetParentFolder(IItem item)
         {
             var path = item.Path.TrimEnd('\\');
 
@@ -94,8 +94,7 @@ namespace Mirror2MegaNZ.V2.Logic
             var lastIndexSlash = path.LastIndexOf('\\');
             var result = path.Substring(0, lastIndexSlash);
 
-            // If the result is empty then we need to return the Root path
-            return string.IsNullOrEmpty(result) ? "\\" : result;
+            return result + "\\";
         }
     }
 }

@@ -83,8 +83,6 @@ namespace Mirror2MegaNZ
             return generator.Generate(remoteNodeList);
         }
 
-        
-
         private static void Syncronizer_RemoteFileDeletingHandler(object sender, RemoteDeletingEventArgs e)
         {
             Console.WriteLine($"Do you want to delete the remote file {e.Filename}? (Y/N)");

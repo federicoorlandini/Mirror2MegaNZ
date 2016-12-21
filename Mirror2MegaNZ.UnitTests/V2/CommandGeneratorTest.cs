@@ -563,7 +563,7 @@ namespace Mirror2MegaNZ.UnitTests.V2
             commandList[0].Should().BeOfType<UploadFileCommand>();
             var uploadCommand = (UploadFileCommand)commandList[0];
             uploadCommand.SourcePath.Should().Be(@"c:\testing\Folder1\File1.jpeg");
-            uploadCommand.DestinationPath.Should().Be(@"\Folder1");
+            uploadCommand.DestinationPath.Should().Be(@"\Folder1\");    // We must have the backslash at the end of the path for a folder
             uploadCommand.LastModifiedDate.Should().Be(lastModifiedDate);
 
             mockMegaNzNodeForRemoteRoot.VerifyAll();
@@ -769,7 +769,7 @@ namespace Mirror2MegaNZ.UnitTests.V2
             commandList[1].Should().BeOfType<UploadFileCommand>();
             var uploadCommand = (UploadFileCommand)commandList[1];
             uploadCommand.SourcePath.Should().Be(@"c:\testing\Folder1\File1.jpeg");
-            uploadCommand.DestinationPath.Should().Be(@"\Folder1");
+            uploadCommand.DestinationPath.Should().Be(@"\Folder1\");    // We must have the backslash at the end of the path for a folder
             uploadCommand.LastModifiedDate.Should().Be(lastModifiedDate);
 
             mockMegaNzNodeForRemoteRoot.VerifyAll();
@@ -848,7 +848,7 @@ namespace Mirror2MegaNZ.UnitTests.V2
             commandList[1].Should().BeOfType<UploadFileCommand>();
             var uploadCommand = (UploadFileCommand)commandList[1];
             uploadCommand.SourcePath.Should().Be(@"c:\testing\Folder1\File1.jpeg");
-            uploadCommand.DestinationPath.Should().Be(@"\Folder1");
+            uploadCommand.DestinationPath.Should().Be(@"\Folder1\");    // We must have the backslash at the end of the path for a folder
             uploadCommand.LastModifiedDate.Should().Be(localLastModifiedDate);
 
             mockMegaNzNodeForRemoteRoot.VerifyAll();
@@ -927,12 +927,40 @@ namespace Mirror2MegaNZ.UnitTests.V2
             commandList[1].Should().BeOfType<UploadFileCommand>();
             var uploadFileCommand = (UploadFileCommand)commandList[1];
             uploadFileCommand.SourcePath.Should().Be(localBasePath + folderName + @"\" + fileName);
-            uploadFileCommand.DestinationPath.Should().Be(@"\" + folderName);
+            uploadFileCommand.DestinationPath.Should().Be(@"\" + folderName + @"\");    // Because we need the backslash at the end of the path for a folder
             uploadFileCommand.LastModifiedDate.Should().Be(localLastModifiedDate);
 
             mockMegaNzNodeForRemoteRoot.VerifyAll();
             mockMegaNzNodeForRemoteFolder1.VerifyAll();
             mockMegaNzNodeForRemoteFile1.VerifyAll();
+        }
+
+        [Test]
+        public void GetParentFolder_forTheRootPath_shouldReturnAnEmptyString()
+        {
+            // Arrange
+            var fileItem = new FileItem(ItemType.Folder, "\\", 0);
+
+            // Act
+            var commandGenerator = new CommandGenerator("\\");
+            var parentFolder = commandGenerator.GetParentFolder(fileItem);
+
+            // Assert
+            parentFolder.Should().BeEmpty();
+        }
+
+        [Test]
+        public void GetParentFolder_forANotRootPath_shouldReturnTheCorrectParentFolderWithAnEndingBackSlash()
+        {
+            // Arrange
+            var fileItem = new FileItem(ItemType.Folder, "\\folder1\\folder2\\", 0);
+
+            // Act
+            var commandGenerator = new CommandGenerator("\\");
+            var parentFolder = commandGenerator.GetParentFolder(fileItem);
+
+            // Assert
+            parentFolder.Should().Be("\\folder1\\");    // We need to have the final backslash in the parent path
         }
     }
 }
