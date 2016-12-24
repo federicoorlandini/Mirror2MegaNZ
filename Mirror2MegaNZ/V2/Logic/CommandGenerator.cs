@@ -69,7 +69,8 @@ namespace Mirror2MegaNZ.V2.Logic
                 commands.Add(new UploadFileCommand {
                     SourcePath = LocalBasePath.TrimEnd('\\') + file.Path,
                     DestinationPath = GetParentFolder(file),
-                    LastModifiedDate = file.LastModified.Value
+                    LastModifiedDate = file.LastModified.Value,
+                    Size = file.Size
                 });
             }
 

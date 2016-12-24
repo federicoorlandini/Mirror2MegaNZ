@@ -24,7 +24,7 @@ namespace Mirror2MegaNZ
             // Read the configuration
             var configuration = new ConfigurationReader();
 
-            foreach(var account in configuration.Accounts)
+            foreach(var account in configuration.Accounts.Where(account => account.Synchronize))
             {
                 logger.Trace("Processing the account {0}", account.Name);
                 ProcessAccount(account, logger);
@@ -53,8 +53,19 @@ namespace Mirror2MegaNZ
                 return;
             }
 
+            // Showing the commands and asking if continue
             ShowCommandList(commandList);
+            if( commandList.OfType<DeleteFileCommand>().Any())
+            {
+                Console.WriteLine("There are some files to delete. Continue? (y/n)");
+                var continueAnswer = Console.ReadLine();
+                if( continueAnswer.ToLower() != "y" )
+                {
+                    Console.WriteLine("Exiting...");
+                }
+            }
 
+            // Executing the commands in the list
             var fileManager = new FileManager();
             var progressNotifier = new ProgressNotifier(new ConsoleWrapper());
             var executor = new CommandExecutor(client);
@@ -65,10 +76,26 @@ namespace Mirror2MegaNZ
 
         private static void ShowCommandList(List<ICommand> commandList)
         {
+            Console.WriteLine();
+            Console.WriteLine("##### Command list #####");
             Console.WriteLine("Command list:");
             foreach(var command in commandList)
             {
                 Console.WriteLine(command.ToString());
+                Console.WriteLine();
+            }
+            Console.WriteLine("Command list resume:");
+            Console.WriteLine("Upload file command: " + commandList.OfType<UploadFileCommand>().Count());
+            Console.WriteLine("Create folder command: " + commandList.OfType<CreateFolderCommand>().Count());
+            Console.WriteLine("Delete folder command: " + commandList.OfType<DeleteFolderCommand>().Count());
+            Console.WriteLine("Delete file command: " + commandList.OfType<DeleteFileCommand>().Count());
+            Console.WriteLine("##### End of Command list #####");
+            Console.WriteLine("Press any key to exit or 'X' to stop the execution");
+
+            var key = Console.ReadKey();
+            if( key.Key == ConsoleKey.X )
+            {
+                Environment.Exit(0);
             }
         }
 
@@ -81,58 +108,6 @@ namespace Mirror2MegaNZ
 
             var generator = new MegaNzItemListGenerator();
             return generator.Generate(remoteNodeList);
-        }
-
-        private static void Syncronizer_RemoteFileDeletingHandler(object sender, RemoteDeletingEventArgs e)
-        {
-            Console.WriteLine($"Do you want to delete the remote file {e.Filename}? (Y/N)");
-            var result = Console.ReadKey();
-            e.Cancel = result.Key != ConsoleKey.Y;
-        }
-
-        private static LocalNode GenerateNodesFromFileSystem(string localRootFolder)
-        {
-            if( !Directory.Exists(localRootFolder) )
-            {
-                var message = string.Format("The local root folder {0} deosn't exist", localRootFolder);
-                throw new InvalidOperationException(message);
-            }
-            
-            DirectoryInfo localRootFolderInfo = new DirectoryInfo(localRootFolder);
-
-            var root = new LocalNode
-            {
-                FullPath = localRootFolder,
-                LastModificationDate = localRootFolderInfo.LastWriteTimeUtc,
-                ParentNode = null,
-                Name = localRootFolderInfo.Name,
-                Type = NodeType.Directory
-            };
-
-            FileInfo[] files = localRootFolderInfo.GetFiles();
-            DirectoryInfo[] directories = localRootFolderInfo.GetDirectories();
-
-            // For each file, we add a new LocalNodes to the current node
-            foreach(var file in files)
-            {
-                root.ChildNodes.Add(new LocalNode {
-                    FullPath = file.FullName,
-                    Name = Path.GetFileName(file.FullName),
-                    LastModificationDate = file.LastWriteTimeUtc,
-                    ParentNode = root,
-                    Size = file.Length,
-                    Type = NodeType.File
-                });
-            }
-
-            // for each directory, we call the same same method recursively
-            foreach(var directory in directories)
-            {
-                var childFolder = GenerateNodesFromFileSystem(directory.FullName);
-                root.ChildNodes.Add(childFolder);
-            }
-
-            return root;
         }
 
         private static List<FileItem> GenerateListFromLocalFolder(string localRootFolder, string basePath)

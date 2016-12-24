@@ -10,6 +10,7 @@ namespace Mirror2MegaNZ.V2.DomainModel.Commands
     {
         public string SourcePath { get; set; }
         public string DestinationPath { get; set; }
+        public long Size { get; set; }
 
         /// <summary>
         /// Gets or sets the last modified date of the file to upload.
@@ -38,7 +39,7 @@ namespace Mirror2MegaNZ.V2.DomainModel.Commands
 
         public override string ToString()
         {
-            return $"Upload File Command - SourcePath: {SourcePath} - DestinationPath: {DestinationPath} - LastModifiedDate: {LastModifiedDate.ToString()}";
+            return $"# Upload File Command\r\nSourcePath: {SourcePath}\r\nDestinationPath: {DestinationPath}\r\nLastModifiedDate: {LastModifiedDate.ToString()}\r\nSize: {FileSizeFormatter.Format(Size)}";
         }
     }
 }

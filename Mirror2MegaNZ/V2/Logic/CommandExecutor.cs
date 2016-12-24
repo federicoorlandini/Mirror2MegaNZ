@@ -25,6 +25,8 @@ namespace Mirror2MegaNZ.V2.Logic
         {
             foreach(var command in commands)
             {
+                Console.WriteLine();
+                Console.WriteLine(command.ToString());
                 command.Execute(_megaApiClient, megaNzItemCollection, fileManager, progressNotifier);
             }
         }
