@@ -77,13 +77,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="HashGeneratorTests.cs" />
     <Compile Include="NameHandlerTests.cs" />
-    <Compile Include="NodeComparerTests.cs" />
-    <Compile Include="UpdaterTests.cs" />
-    <Compile Include="CleanerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TreeBuilderTests.cs" />
     <Compile Include="V2\CommandExecutorTest.cs" />
     <Compile Include="V2\FileItemTests.cs" />
     <Compile Include="V2\LocalFileItemListGeneratorTests.cs" />

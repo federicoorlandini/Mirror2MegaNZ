@@ -54,6 +54,5 @@ Here there is an explaination about all the configuration parameter:
 - Before starting to synchronize the files, the tool will show you a resume of the actions it will take. You can decide to continue or not.
 
 ## TODO
-- Add a retry policy when uploading the files;
 - Add logging on local text files;
 - Add an initial check to control if the MegaNZ account has enough free space to complete the synchronization;

@@ -45,6 +45,10 @@ namespace Mirror2MegaNZ.V2.Logic
             }
         }
 
+        /// <summary>
+        /// Gets the list of all the items in the collection
+        /// </summary>
+        /// <returns></returns>
         public List<MegaNzItem> GetList()
         {
             return _collection.ToList();

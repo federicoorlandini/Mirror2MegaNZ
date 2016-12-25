@@ -5,6 +5,10 @@ using System.Collections.Generic;
 
 namespace Mirror2MegaNZ.V2.DomainModel
 {
+    /// <summary>
+    /// This is an item related to a file/folder in a MegaNZ account
+    /// </summary>
+    /// <seealso cref="Mirror2MegaNZ.V2.DomainModel.IItem" />
     internal class MegaNzItem : IItem
     {
         public string Name { get; private set; }

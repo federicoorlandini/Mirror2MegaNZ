@@ -1,5 +1,4 @@
 ﻿using CG.Web.MegaApiClient;
-using Mirror2MegaNZ.DomainModel;
 using System;
 using System.IO;
 using System.Linq;
@@ -49,7 +48,7 @@ namespace Mirror2MegaNZ
 
             if( !commandList.Any() )
             {
-                Console.WriteLine("Nothing to do here. Exiting.....");
+                logger.Trace("Nothing to do here. Exiting.....");
                 return;
             }
 
@@ -61,14 +60,14 @@ namespace Mirror2MegaNZ
                 var continueAnswer = Console.ReadLine();
                 if( continueAnswer.ToLower() != "y" )
                 {
-                    Console.WriteLine("Exiting...");
+                    logger.Trace("Exiting...");
                 }
             }
 
             // Executing the commands in the list
             var fileManager = new FileManager();
             var progressNotifier = new ProgressNotifier(new ConsoleWrapper());
-            var executor = new CommandExecutor(client);
+            var executor = new CommandExecutor(client, logger);
 
             var megaNzItemCollection = new MegaNzItemCollection(itemListFromMegaNz);
             executor.Execute(commandList, megaNzItemCollection, fileManager, progressNotifier);
@@ -76,21 +75,21 @@ namespace Mirror2MegaNZ
 
         private static void ShowCommandList(List<ICommand> commandList)
         {
-            Console.WriteLine();
-            Console.WriteLine("##### Command list #####");
-            Console.WriteLine("Command list:");
+            logger.Trace(string.Empty);
+            logger.Trace("##### Command list #####");
+            logger.Trace("Command list:");
             foreach(var command in commandList)
             {
-                Console.WriteLine(command.ToString());
-                Console.WriteLine();
+                logger.Trace(command.ToString());
+                logger.Trace(string.Empty);
             }
-            Console.WriteLine("Command list resume:");
-            Console.WriteLine("Upload file command: " + commandList.OfType<UploadFileCommand>().Count());
-            Console.WriteLine("Create folder command: " + commandList.OfType<CreateFolderCommand>().Count());
-            Console.WriteLine("Delete folder command: " + commandList.OfType<DeleteFolderCommand>().Count());
-            Console.WriteLine("Delete file command: " + commandList.OfType<DeleteFileCommand>().Count());
-            Console.WriteLine("##### End of Command list #####");
-            Console.WriteLine("Press any key to exit or 'X' to stop the execution");
+            logger.Trace("Command list resume:");
+            logger.Trace("Upload file command: " + commandList.OfType<UploadFileCommand>().Count());
+            logger.Trace("Create folder command: " + commandList.OfType<CreateFolderCommand>().Count());
+            logger.Trace("Delete folder command: " + commandList.OfType<DeleteFolderCommand>().Count());
+            logger.Trace("Delete file command: " + commandList.OfType<DeleteFileCommand>().Count());
+            logger.Trace("##### End of Command list #####");
+            logger.Trace("Press any key to exit or 'X' to stop the execution");
 
             var key = Console.ReadKey();
             if( key.Key == ConsoleKey.X )

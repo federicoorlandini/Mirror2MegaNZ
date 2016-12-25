@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using FluentAssertions;
 using Mirror2MegaNZ.Logic;
 using System.IO;
+using NLog;
 
 namespace Mirror2MegaNZ.UnitTests.V2
 {
@@ -16,6 +17,8 @@ namespace Mirror2MegaNZ.UnitTests.V2
     [Category("V2")]
     public class CommandExecutorTest
     {
+        private readonly Mock<ILogger> _mockLogger = new Mock<ILogger>();
+
         [Test]
         public void Execute_withAnUploadCommand_shouldMakeTheCorrectCallToTheMegaNzClient()
         {
@@ -67,7 +70,7 @@ namespace Mirror2MegaNZ.UnitTests.V2
             mockFileManager.Setup(m => m.GetStreamToReadFile(sourcePath)).Returns((FileStream)null);
 
             // Act
-            var executor = new CommandExecutor(mockMegaApiClient.Object);
+            var executor = new CommandExecutor(mockMegaApiClient.Object, _mockLogger.Object);
             executor.Execute(commandList, megaNzItemCollection, mockFileManager.Object, mockProgressNotifier.Object);
 
             // Assert
@@ -131,7 +134,7 @@ namespace Mirror2MegaNZ.UnitTests.V2
             mockFileManager.Setup(m => m.GetStreamToReadFile(sourcePath)).Returns((FileStream)null);
 
             // Act
-            var executor = new CommandExecutor(mockMegaApiClient.Object);
+            var executor = new CommandExecutor(mockMegaApiClient.Object, _mockLogger.Object);
             executor.Execute(commandList, megaNzItemCollection, mockFileManager.Object, mockProgressNotifier.Object);
 
             // Assert
@@ -188,7 +191,7 @@ namespace Mirror2MegaNZ.UnitTests.V2
             var mockProgressNotifier = new Mock<IProgress<double>>(MockBehavior.Strict);
 
             // Act
-            var commandExecutor = new CommandExecutor(mockMegaApiClient.Object);
+            var commandExecutor = new CommandExecutor(mockMegaApiClient.Object, _mockLogger.Object);
             commandExecutor.Execute(commandList, megaNzItemCollection, mockFileManager.Object, mockProgressNotifier.Object);
 
             mockMegaApiClient.VerifyAll();
@@ -244,7 +247,7 @@ namespace Mirror2MegaNZ.UnitTests.V2
             var mockProgressNotifier = new Mock<IProgress<double>>(MockBehavior.Strict);
 
             // Act
-            var commandExecutor = new CommandExecutor(mockMegaApiClient.Object);
+            var commandExecutor = new CommandExecutor(mockMegaApiClient.Object, _mockLogger.Object);
             commandExecutor.Execute(commandList, megaNzItemCollection, mockFileManager.Object, mockProgressNotifier.Object);
 
             // Assert
@@ -314,7 +317,7 @@ namespace Mirror2MegaNZ.UnitTests.V2
             var mockProgressNotifier = new Mock<IProgress<double>>(MockBehavior.Strict);
 
             // Act
-            var commandExecutor = new CommandExecutor(mockMegaApiClient.Object);
+            var commandExecutor = new CommandExecutor(mockMegaApiClient.Object, _mockLogger.Object);
             commandExecutor.Execute(commandList, megaNzItemCollection, mockFileManager.Object, mockProgressNotifier.Object);
 
             // Assert
@@ -386,7 +389,7 @@ namespace Mirror2MegaNZ.UnitTests.V2
             var mockProgressNotifier = new Mock<IProgress<double>>(MockBehavior.Strict);
 
             // Act
-            var commandExecutor = new CommandExecutor(mockMegaApiClient.Object);
+            var commandExecutor = new CommandExecutor(mockMegaApiClient.Object, _mockLogger.Object);
             commandExecutor.Execute(commandList, megaNzItemCollection, mockFileManager.Object, mockProgressNotifier.Object);
 
             // Assert
@@ -457,7 +460,7 @@ namespace Mirror2MegaNZ.UnitTests.V2
             var mockProgressNotifier = new Mock<IProgress<double>>(MockBehavior.Strict);
 
             // Act
-            var commandExecutor = new CommandExecutor(mockMegaApiClient.Object);
+            var commandExecutor = new CommandExecutor(mockMegaApiClient.Object, _mockLogger.Object);
             commandExecutor.Execute(commandList, megaNzItemCollection, mockFileManager.Object, mockProgressNotifier.Object);
 
             // Assert
@@ -528,7 +531,7 @@ namespace Mirror2MegaNZ.UnitTests.V2
             var mockProgressNotifier = new Mock<IProgress<double>>(MockBehavior.Strict);
 
             // Act
-            var commandExecutor = new CommandExecutor(mockMegaApiClient.Object);
+            var commandExecutor = new CommandExecutor(mockMegaApiClient.Object, _mockLogger.Object);
             commandExecutor.Execute(commandList, megaNzItemCollection, mockFileManager.Object, mockProgressNotifier.Object);
 
             // Assert

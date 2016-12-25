@@ -69,25 +69,15 @@
   <ItemGroup>
     <Compile Include="Configuration\Account.cs" />
     <Compile Include="Configuration\ConfigurationReader.cs" />
-    <Compile Include="DomainModel\MegaNZNode.cs" />
-    <Compile Include="DomainModel\MegaNZTreeNode.cs" />
     <Compile Include="Logic\ConsoleWrapper.cs" />
     <Compile Include="Logic\FileManager.cs" />
     <Compile Include="Logic\FileSizeFormatter.cs" />
     <Compile Include="Logic\IConsoleWrapper.cs" />
     <Compile Include="Logic\IFileManager.cs" />
     <Compile Include="Logic\NameHandler.cs" />
-    <Compile Include="Logic\NodeComparer.cs" />
-    <Compile Include="Logic\NodeConverter.cs" />
-    <Compile Include="Logic\Cleaner.cs" />
     <Compile Include="Logic\ProgressNotifier.cs" />
-    <Compile Include="Logic\RemoteFileDeletingEventArgs.cs" />
-    <Compile Include="Logic\Synchronizer.cs" />
-    <Compile Include="DomainModel\LocalNode.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Logic\TreeBuilder.cs" />
-    <Compile Include="Logic\Updater.cs" />
     <Compile Include="V2\DomainModel\Commands\DeleteFolderCommand.cs" />
     <Compile Include="V2\DomainModel\Commands\ICommand.cs" />
     <Compile Include="V2\DomainModel\Commands\DeleteFileCommand.cs" />
@@ -115,7 +105,9 @@
     </Content>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="DomainModel\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
