@@ -78,22 +78,22 @@
     <Compile Include="Logic\ProgressNotifier.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="V2\DomainModel\Commands\DeleteFolderCommand.cs" />
-    <Compile Include="V2\DomainModel\Commands\ICommand.cs" />
-    <Compile Include="V2\DomainModel\Commands\DeleteFileCommand.cs" />
-    <Compile Include="V2\DomainModel\Commands\CreateFolderCommand.cs" />
-    <Compile Include="V2\DomainModel\Commands\UploadFileCommand.cs" />
-    <Compile Include="V2\DomainModel\IItem.cs" />
-    <Compile Include="V2\DomainModel\ItemType.cs" />
-    <Compile Include="V2\DomainModel\FileItem.cs" />
-    <Compile Include="V2\DomainModel\MegaNzItem.cs" />
-    <Compile Include="V2\Logic\MegaNzItemCollection.cs" />
-    <Compile Include="V2\Logic\CommandExecutor.cs" />
-    <Compile Include="V2\Logic\IMegaNzItemCollection.cs" />
-    <Compile Include="V2\Logic\ItemComparer.cs" />
-    <Compile Include="V2\Logic\LocalFileItemListGenerator.cs" />
-    <Compile Include="V2\Logic\MegaNzItemListGenerator.cs" />
-    <Compile Include="V2\Logic\CommandGenerator.cs" />
+    <Compile Include="DomainModel\Commands\DeleteFolderCommand.cs" />
+    <Compile Include="DomainModel\Commands\ICommand.cs" />
+    <Compile Include="DomainModel\Commands\DeleteFileCommand.cs" />
+    <Compile Include="DomainModel\Commands\CreateFolderCommand.cs" />
+    <Compile Include="DomainModel\Commands\UploadFileCommand.cs" />
+    <Compile Include="DomainModel\IItem.cs" />
+    <Compile Include="DomainModel\ItemType.cs" />
+    <Compile Include="DomainModel\FileItem.cs" />
+    <Compile Include="DomainModel\MegaNzItem.cs" />
+    <Compile Include="Logic\MegaNzItemCollection.cs" />
+    <Compile Include="Logic\CommandExecutor.cs" />
+    <Compile Include="Logic\IMegaNzItemCollection.cs" />
+    <Compile Include="Logic\ItemComparer.cs" />
+    <Compile Include="Logic\LocalFileItemListGenerator.cs" />
+    <Compile Include="Logic\MegaNzItemListGenerator.cs" />
+    <Compile Include="Logic\CommandGenerator.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -105,9 +105,7 @@
     </Content>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="DomainModel\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -79,13 +79,13 @@
   <ItemGroup>
     <Compile Include="NameHandlerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="V2\CommandExecutorTest.cs" />
-    <Compile Include="V2\FileItemTests.cs" />
-    <Compile Include="V2\LocalFileItemListGeneratorTests.cs" />
-    <Compile Include="V2\MegaNzItemListGeneratorTests.cs" />
-    <Compile Include="V2\MegaNzItemTests.cs" />
-    <Compile Include="V2\MegaNzNodeMock.cs" />
-    <Compile Include="V2\CommandGeneratorTest.cs" />
+    <Compile Include="CommandExecutorTest.cs" />
+    <Compile Include="FileItemTests.cs" />
+    <Compile Include="LocalFileItemListGeneratorTests.cs" />
+    <Compile Include="MegaNzItemListGeneratorTests.cs" />
+    <Compile Include="MegaNzItemTests.cs" />
+    <Compile Include="MegaNzNodeMock.cs" />
+    <Compile Include="CommandGeneratorTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

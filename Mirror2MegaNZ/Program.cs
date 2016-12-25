@@ -6,11 +6,10 @@ using Mirror2MegaNZ.Configuration;
 using NLog;
 using Mirror2MegaNZ.Logic;
 using System.Collections.Generic;
-using Mirror2MegaNZ.V2.DomainModel;
+using Mirror2MegaNZ.DomainModel;
 using SystemInterface.IO;
 using SystemWrapper.IO;
-using Mirror2MegaNZ.V2.Logic;
-using Mirror2MegaNZ.V2.DomainModel.Commands;
+using Mirror2MegaNZ.DomainModel.Commands;
 
 namespace Mirror2MegaNZ
 {
